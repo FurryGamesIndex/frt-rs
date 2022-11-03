@@ -1,18 +1,16 @@
 use core::fmt;
 use std::fmt::Display;
 
-pub type AnyError = Box<dyn std::error::Error>;
-
 /// Errors that can occur in FRT.
 #[derive(Debug)]
-struct Error {
+pub struct Error {
     kind: ErrorKind,
     message: String
 }
 
 /// Errors that can occur in FRT.
 #[derive(Debug, PartialEq, Eq, Clone)]
-enum ErrorKind {
+pub enum ErrorKind {
     /// Any other kind of errors not listed.
     Other,
 }
