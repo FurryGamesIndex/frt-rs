@@ -10,6 +10,7 @@ pub struct RawAuthorItem {
 
 
 #[derive(Deserialize, Debug)]
+#[serde(untagged)]
 pub enum RawLinkItem {
     Custom {
         name: String,
@@ -25,6 +26,7 @@ pub struct RawVideoSourceItem {
 }
 
 #[derive(Deserialize, Debug)]
+#[serde(untagged)]
 pub enum RawScreenshotItem {
     Image (String),
     Youtube {
