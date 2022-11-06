@@ -28,16 +28,17 @@ pub struct RawVideoSourceItem {
 #[derive(Deserialize, Debug)]
 #[serde(untagged)]
 pub enum RawScreenshotItem {
-    Image (String),
+    SimpleImage (String),
+    Image {
+        #[serde(default)]
+        sensitive: bool,
+        uri: String,
+    },
     Youtube {
-        #[serde(rename = "type")]
-        kind: String,
-        id: String,
+        youtube: String,
     },
     Video {
-        #[serde(rename = "type")]
-        kind: String,
-        src: Vec<RawVideoSourceItem>,
+        video: Vec<RawVideoSourceItem>,
     }
 
 }
