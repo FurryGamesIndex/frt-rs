@@ -11,6 +11,10 @@ pub struct Error {
 /// Errors that can occur in FRT.
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum ErrorKind {
+
+    /// Bundle invalid, missing required files. etc
+    InvalidBundle,
+
     /// Any other kind of errors not listed.
     Other,
 }
@@ -20,9 +24,19 @@ impl std::error::Error for Error {}
 impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match &self.kind {
-            ErrorKind::Other => write!(f, "{}", "Other: ")?
+            ErrorKind::InvalidBundle => write!(f, "{}", "Bundle is invalid: ")?,
+            ErrorKind::Other => write!(f, "{}", "Other: ")?,
         };
         write!(f, "{}", self.message)?;
         Ok(())
+    }
+}
+
+impl Error {
+    pub fn new(kind: ErrorKind, message: &str) -> Self {
+        Self {
+            kind: kind,
+            message: message.to_owned()
+        }
     }
 }

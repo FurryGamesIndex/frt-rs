@@ -50,16 +50,19 @@ pub struct RawGame {
     pub description: String,
 
     #[serde(rename = "description-format")]
-    pub description_format: String,
+    pub description_format: Option<String>,
 
     #[serde(rename = "brief-description")]
     pub brief_description: Option<String>,
 
     pub thumbnail: String,
 
+    #[serde(default)]
     pub authors: Vec<RawAuthorItem>,
 
+    #[serde(default)]
     pub links: Vec<RawLinkItem>,
 
+    #[serde(default)]
     pub screenshots: Vec<RawScreenshotItem>
 }
