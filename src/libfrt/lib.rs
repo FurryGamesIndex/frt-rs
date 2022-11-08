@@ -1,4 +1,3 @@
-
 pub mod entries;
 pub mod profile;
 pub mod utils;
@@ -46,7 +45,7 @@ impl Context {
 
         let raw_game = serde_yaml::from_str(&std::fs::read_to_string(path_game_yaml)?)?;
 
-        let game = Game::build(self, id, raw_game);
+        let game = Game::build(self, id, raw_game)?;
         
         Ok(game)
     }

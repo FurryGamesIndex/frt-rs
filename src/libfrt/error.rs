@@ -15,6 +15,9 @@ pub enum ErrorKind {
     /// Bundle invalid, missing required files. etc
     InvalidBundle,
 
+    /// Invalid value format, unknown enum value, etc
+    InvalidArgument,
+
     /// Any other kind of errors not listed.
     Other,
 }
@@ -25,6 +28,7 @@ impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match &self.kind {
             ErrorKind::InvalidBundle => write!(f, "{}", "Bundle is invalid: ")?,
+            ErrorKind::InvalidArgument => write!(f, "{}", "Invalid argument: ")?,
             ErrorKind::Other => write!(f, "{}", "Other: ")?,
         };
         write!(f, "{}", self.message)?;
