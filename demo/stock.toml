@@ -2,33 +2,49 @@
 # Stock Links Configuration #
 #############################
 
+[link.website]
+icon = "site-website"
+label = { _ = "Official website", zh-cn = "官方网站" }
+passthrough = true
+
+###############################################################################
+
 [link.twitter]
 icon = "site-twitter"
-label = { _ = "Twitter: @{1}", zh-cn = "" }
+label = { _ = "Twitter: @{1}" }
 regex = "^twitter:(.*)$"
 www_href = "https://twitter.com/{1}"
 inference = true
 
 ###############################################################################
 
+[link.furaffinity]
+icon = "site-furaffinity"
+label = { _ = "FurAffinity: @{1}" }
+regex = "^furaffinity:(.*)$"
+www_href = "https://www.furaffinity.net/user/{1}/"
+inference = true
+
+###############################################################################
+
 [link.itch]
 icon = "site-itch"
-label = { _ = "Get it on itch.io", zh-cn = "" }
+label = { _ = "Get on itch.io", zh-cn = "在 itch.io 上获取" }
 passthrough = true
 
 ###############################################################################
 
 [link.steam]
 icon = "site-steam"
-label = { _ = "Get it on Steam" }
+label = { _ = "Get on Steam", zh-cn = "在 Steam 上获取" }
 regex = "^steam:(.*)$"
 named_matches = [ "id" ]
-www_href = "TODO"
+www_href = "https://store.steampowered.com/app/{id}"
 inference = true
 
 [link.steam-demo]
-label = { _ = "Get demo version on Steam" }
+label = { _ = "Get demo version on Steam", zh-cn = "在 Steam 上获取演示版本" }
 regex = "^steam-demo:(.*)$"
 named_matches = [ "id" ]
-www_href = "TODO"
+www_href = "https://store.steampowered.com/app/{id}"
 inference = true
