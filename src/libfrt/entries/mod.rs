@@ -1,4 +1,7 @@
+pub mod image;
+pub mod link;
+
 pub mod game;
 pub mod author;
 
-pub(crate) mod game_raw;
+pub(crate) mod raw;

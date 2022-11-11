@@ -40,7 +40,6 @@ pub enum RawScreenshotItem {
     Video {
         video: Vec<RawVideoSourceItem>,
     }
-
 }
 
 #[derive(Deserialize, Debug)]
@@ -65,4 +64,14 @@ pub struct RawGame {
 
     #[serde(default)]
     pub screenshots: Vec<RawScreenshotItem>
+}
+
+#[derive(Deserialize, Debug)]
+pub struct Author {
+    pub name: String,
+
+    #[serde(default)]
+    pub aliases: Vec<String>,
+
+    
 }

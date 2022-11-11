@@ -1,14 +1,15 @@
 pub mod entries;
 pub mod profile;
+pub mod i18n;
 pub mod utils;
 pub mod error;
 
 use std::collections::HashMap;
-use std::{fs, path::PathBuf};
+use std::fs;
 use std::path::Path;
 use anyhow::Result;
 
-use entries::{game::Game, game_raw::RawGame, author::Author};
+use entries::{game::Game, author::Author};
 use profile::Profile;
 use error::{Error, ErrorKind};
 
@@ -65,7 +66,27 @@ impl Context {
         Ok(())
     }
 
+    pub fn build_author(&self, path: &Path) -> Result<Author> {
+        todo!()
+    }
+
+    pub fn load_author(&mut self, path: &Path) -> Result<()> {
+        Ok(())
+    }
+
+    pub fn load_authors(&mut self) -> Result<()> {
+        let paths = fs::read_dir(&self.profile.path_authors)?;
+        for path in paths {
+            let path = path?.path();
+            if path.ends_with(".yaml") {
+                self.load_author(&path)?;
+            }
+        }
+        Ok(())
+    }
+
     pub fn full_init(&mut self) -> Result<()> {
+        self.load_authors()?;
         self.load_games()?;
         Ok(())
     }

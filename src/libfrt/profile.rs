@@ -1,6 +1,7 @@
-use serde::Deserialize;
-use std::path::Path;
+use std::{path::Path, collections::HashMap};
 
+use serde::Deserialize;
+use toml::Value;
 use anyhow::Result;
 
 #[derive(Deserialize, Debug)]
@@ -11,6 +12,8 @@ pub struct Profile {
     pub stock_config: String,
     pub path_games: String,
     pub path_authors: String,
+
+    pub backends: HashMap<String, Value>
 }
 
 impl Default for Profile {
@@ -21,6 +24,8 @@ impl Default for Profile {
             stock_config: Path::new("frt").join("stock.toml").to_str().unwrap().to_string(),
             path_games: String::from("games"),
             path_authors: String::from("authors"),
+
+            backends: HashMap::new(),
         }
     }
 }

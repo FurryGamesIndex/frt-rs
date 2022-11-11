@@ -1,8 +1,11 @@
+use std::collections::HashMap;
+
 use anyhow::Result;
 
-use super::game_raw::RawGame;
+use super::raw::RawGame;
 use crate::Context;
 use crate::error::{Error, ErrorKind};
+use crate::i18n::LangId;
 
 #[derive(Debug)]
 pub enum Description {
@@ -16,6 +19,14 @@ pub struct Game {
     pub name: String,
     pub description: Description,
     pub brief_description: Option<String>,
+
+    pub l10n: HashMap<LangId, GameL10n>,
+}
+
+#[derive(Debug)]
+pub struct GameL10n {
+    pub name: Option<String>,
+    pub description: Option<Description>,
 }
 
 impl Game {
@@ -37,7 +48,9 @@ impl Game {
             id: id,
             name: raw_game.name,
             description: description,
-            brief_description: raw_game.brief_description
+            brief_description: raw_game.brief_description,
+
+            l10n: HashMap::new(),
         })
     }
 }

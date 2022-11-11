@@ -1,0 +1,34 @@
+#############################
+# Stock Links Configuration #
+#############################
+
+[link.twitter]
+icon = "site-twitter"
+label = { _ = "Twitter: @{1}", zh-cn = "" }
+regex = "^twitter:(.*)$"
+www_href = "https://twitter.com/{1}"
+inference = true
+
+###############################################################################
+
+[link.itch]
+icon = "site-itch"
+label = { _ = "Get it on itch.io", zh-cn = "" }
+passthrough = true
+
+###############################################################################
+
+[link.steam]
+icon = "site-steam"
+label = { _ = "Get it on Steam" }
+regex = "^steam:(.*)$"
+named_matches = [ "id" ]
+www_href = "TODO"
+inference = true
+
+[link.steam-demo]
+label = { _ = "Get demo version on Steam" }
+regex = "^steam-demo:(.*)$"
+named_matches = [ "id" ]
+www_href = "TODO"
+inference = true
