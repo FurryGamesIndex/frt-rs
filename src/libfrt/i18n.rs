@@ -1,9 +1,17 @@
-#[derive(Debug)]
+use serde::Deserialize;
+
+#[derive(Eq, PartialEq, Hash, Debug)]
 pub enum LangId {
     EnUs,
     ZhCn,
     ZhTw,
     Ja
+}
+
+impl Default for LangId {
+    fn default() -> Self {
+        LangId::EnUs
+    }
 }
 
 impl From<&str> for LangId {
@@ -14,6 +22,14 @@ impl From<&str> for LangId {
             "ja-jp" | "ja" => LangId::Ja,
             _ => LangId::EnUs,
         }
+    }
+}
+
+impl<'de> Deserialize<'de> for LangId {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where D: serde::Deserializer<'de> {
+        let s = String::deserialize(deserializer)?;
+        Ok(s.as_str().into())
     }
 }
 

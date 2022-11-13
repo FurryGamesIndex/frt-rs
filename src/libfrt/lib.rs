@@ -10,27 +10,19 @@ use std::path::Path;
 use anyhow::Result;
 
 use entries::{game::Game, author::Author};
+use entries::link::LinkRuleManager;
 use profile::Profile;
 use error::{Error, ErrorKind};
 
 #[derive(Default)]
-pub struct Context {
-    pub profile: Profile,
+pub struct ContextData {
+    pub authors: HashMap<String, Author>,
+    pub games: HashMap<String, Game>,
 
-    pub(crate) authors: HashMap<String, Author>,
-    pub(crate) games: HashMap<String, Game>,
+    pub link_rules: LinkRuleManager,
 }
 
-impl Context {
-    pub fn new(profile: Profile) -> Self {
-        Self {
-            profile: profile,
-
-            authors: HashMap::new(),
-            games: HashMap::new(),
-        }
-    }
-
+impl ContextData {
     pub fn build_game(&self, path: &Path) -> Result<Game> {
         let id = path.file_name()
             .ok_or_else(|| Error::new(ErrorKind::Other, "Can not get path name"))?
@@ -57,15 +49,6 @@ impl Context {
         Ok(())
     }
 
-    pub fn load_games(&mut self) -> Result<()> {
-        let paths = fs::read_dir(&self.profile.path_games)?;
-        for path in paths {
-            let path = path?.path();
-            self.load_game(&path)?;
-        }
-        Ok(())
-    }
-
     pub fn build_author(&self, path: &Path) -> Result<Author> {
         todo!()
     }
@@ -74,18 +57,72 @@ impl Context {
         Ok(())
     }
 
-    pub fn load_authors(&mut self) -> Result<()> {
-        let paths = fs::read_dir(&self.profile.path_authors)?;
-        for path in paths {
-            let path = path?.path();
-            if path.ends_with(".yaml") {
-                self.load_author(&path)?;
+    pub fn load_stock(&mut self, file: &Path) -> Result<()> {
+        let content = std::fs::read_to_string(file)?;
+        let rule = toml::from_str(content.as_str())?;
+        self.link_rules.add_rule(rule)?;
+
+        Ok(())
+    }
+}
+
+#[derive(Default)]
+pub struct Context {
+    pub profile: Profile,
+
+    pub(crate) data: ContextData,
+}
+
+impl Context {
+    pub fn new(profile: Profile) -> Self {
+        Self {
+            profile: profile,
+
+            data: ContextData::default(),
+        }
+    }
+
+    pub fn load_games(&mut self) -> Result<()> {
+        for i in self.profile.path_games.iter() {
+            let paths = fs::read_dir(i)?;
+            for path in paths {
+                let path = path?.path();
+                self.data.load_game(&path)?;
             }
         }
+
+        Ok(())
+    }
+
+    pub fn load_authors(&mut self) -> Result<()> {
+        for i in self.profile.path_authors.iter() {
+            let paths = fs::read_dir(i)?;
+            for path in paths {
+                let path = path?.path();
+                if path.ends_with(".yaml") {
+                    self.data.load_author(&path)?;
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn load_config(&mut self) -> Result<()> {
+        for i in &self.profile.stock_config {
+            self.data.load_stock(Path::new(i))?;
+        }
+
+        Ok(())
+    }
+
+    pub fn init(&mut self) -> Result<()> {
+        self.load_config()?;
         Ok(())
     }
 
     pub fn full_init(&mut self) -> Result<()> {
+        self.init()?;
         self.load_authors()?;
         self.load_games()?;
         Ok(())

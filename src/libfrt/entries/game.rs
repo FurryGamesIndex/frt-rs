@@ -2,8 +2,9 @@ use std::collections::HashMap;
 
 use anyhow::Result;
 
-use super::raw::RawGame;
-use crate::Context;
+use super::raw::{RawGame, RawLinkItem};
+use super::link::Link;
+use crate::ContextData;
 use crate::error::{Error, ErrorKind};
 use crate::i18n::LangId;
 
@@ -19,6 +20,7 @@ pub struct Game {
     pub name: String,
     pub description: Description,
     pub brief_description: Option<String>,
+    pub links: Vec<Link>,
 
     pub l10n: HashMap<LangId, GameL10n>,
 }
@@ -30,7 +32,7 @@ pub struct GameL10n {
 }
 
 impl Game {
-    pub fn build(context: &Context, id: String, raw_game: RawGame) -> Result<Self> {
+    pub fn build(data: &ContextData, id: String, raw_game: RawGame) -> Result<Self> {
 
         let description = match raw_game.description_format {
             Some(format) => {
@@ -44,11 +46,14 @@ impl Game {
             None => Ok(Description::Plain(raw_game.description)),
         }?;
 
+        let links = Vec::new();
+
         Ok(Self {
             id: id,
             name: raw_game.name,
             description: description,
             brief_description: raw_game.brief_description,
+            links: links,
 
             l10n: HashMap::new(),
         })
