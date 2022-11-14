@@ -18,6 +18,9 @@ pub enum ErrorKind {
     /// Invalid value format, unknown enum value, etc
     InvalidArgument,
 
+    /// Template, rule, image or any dependent resource not found
+    NotExist,
+
     /// Any other kind of errors not listed.
     Other,
 }
@@ -29,6 +32,7 @@ impl Display for Error {
         match &self.kind {
             ErrorKind::InvalidBundle => write!(f, "{}", "Bundle is invalid: ")?,
             ErrorKind::InvalidArgument => write!(f, "{}", "Invalid argument: ")?,
+            ErrorKind::NotExist => write!(f, "{}", "No such resouce: ")?,
             ErrorKind::Other => write!(f, "{}", "Other: ")?,
         };
         write!(f, "{}", self.message)?;
