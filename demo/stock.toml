@@ -11,18 +11,18 @@ passthrough = true
 
 [link.twitter]
 icon = "site-twitter"
-label = { _ = "Twitter: @{1}" }
+label = { _ = "Twitter: @{{ _1 }}" }
 regex = "^twitter:(.*)$"
-www_href = "https://twitter.com/{1}"
+www_href = "https://twitter.com/{{ _1 }}"
 inference = true
 
 ###############################################################################
 
 [link.furaffinity]
 icon = "site-furaffinity"
-label = { _ = "FurAffinity: @{1}" }
+label = { _ = "FurAffinity: @{{ _1 }}" }
 regex = "^furaffinity:(.*)$"
-www_href = "https://www.furaffinity.net/user/{1}/"
+www_href = "https://www.furaffinity.net/user/{{ _1 }}/"
 inference = true
 
 ###############################################################################
@@ -37,14 +37,12 @@ passthrough = true
 [link.steam]
 icon = "site-steam"
 label = { _ = "Get on Steam", zh-cn = "在 Steam 上获取" }
-regex = "^steam:(.*)$"
-named_matches = [ "id" ]
-www_href = "https://store.steampowered.com/app/{id}"
+regex = "^steam:(?P<id>.*)$"
+www_href = "https://store.steampowered.com/app/{{ id }}"
 inference = true
 
 [link.steam-demo]
 label = { _ = "Get demo version on Steam", zh-cn = "在 Steam 上获取演示版本" }
-regex = "^steam-demo:(.*)$"
-named_matches = [ "id" ]
-www_href = "https://store.steampowered.com/app/{id}"
+regex = "^steam-demo:(?P<id>.*)$"
+www_href = "https://store.steampowered.com/app/{{ id }}"
 inference = true

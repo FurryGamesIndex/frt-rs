@@ -1,4 +1,14 @@
+use std::collections::HashMap;
+
 use serde::Deserialize;
+
+use super::link::StockLinkRule;
+
+#[derive(Deserialize, Debug)]
+pub struct RawStockConfig {
+    pub link: HashMap<String, StockLinkRule>
+}
+
 
 #[derive(Deserialize, Debug)]
 pub struct RawAuthorItem {

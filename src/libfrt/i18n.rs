@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-#[derive(Eq, PartialEq, Hash, Debug)]
+#[derive(Eq, PartialEq, Clone, Hash, Debug)]
 pub enum LangId {
     EnUs,
     ZhCn,

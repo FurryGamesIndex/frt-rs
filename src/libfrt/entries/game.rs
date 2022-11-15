@@ -46,7 +46,10 @@ impl Game {
             None => Ok(Description::Plain(raw_game.description)),
         }?;
 
-        let links = Vec::new();
+        let links: Result<Vec<_>> = raw_game.links.into_iter()
+            .map(|raw_link| data.link_rules.build_link(raw_link))
+            .collect();
+        let links = links?;
 
         Ok(Self {
             id: id,

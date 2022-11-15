@@ -9,6 +9,7 @@ use std::fs;
 use std::path::Path;
 use anyhow::Result;
 
+use entries::raw::RawStockConfig;
 use entries::{game::Game, author::Author};
 use entries::link::LinkRuleManager;
 use profile::Profile;
@@ -59,8 +60,12 @@ impl ContextData {
 
     pub fn load_stock(&mut self, file: &Path) -> Result<()> {
         let content = std::fs::read_to_string(file)?;
-        let rule = toml::from_str(content.as_str())?;
-        self.link_rules.add_rule(rule)?;
+        let mut stock_config: RawStockConfig = toml::from_str(content.as_str())?;
+
+        for (rule_name, mut rule) in stock_config.link.drain() {
+            rule.name = rule_name;
+            self.link_rules.add_rule(rule)?;
+        }
 
         Ok(())
     }

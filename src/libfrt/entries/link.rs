@@ -4,6 +4,7 @@ use std::rc::Rc;
 use anyhow::Result;
 use regex::Regex;
 use serde::Deserialize;
+use crate::utils::tengine;
 
 use super::raw::RawLinkItem;
 use crate::i18n::LangId;
@@ -24,7 +25,6 @@ pub struct StockLinkRule {
     pub label: HashMap<LangId, String>,
     #[serde(with = "serde_regex")]
     pub regex: Option<Regex>,
-    pub named_matches: Vec<String>,
     pub www_href: String,
     pub inference: bool,
     pub passthrough: bool
@@ -38,8 +38,52 @@ impl StockLinkRule {
         }
     }
 
-    pub fn build_link(&self, uri: &str) -> Result<Link> {
-        todo!()
+    pub fn build_link(self: &Rc<Self>, uri: &str) -> Result<Link> {
+        if self.passthrough {
+            Ok(Link {
+                label: self.label.clone(),
+                uri: uri.to_owned(),
+                rule: Some(self.clone()),
+                variables: HashMap::new(),
+            })
+        } else {
+            let mut label = self.label.clone();
+            let mut final_uri = self.www_href.to_owned();
+            let mut variables = HashMap::new();
+
+            if let Some(re) = &self.regex {
+                let caps = re.captures(uri)
+                    .ok_or_else(|| Error::new(ErrorKind::InvalidArgument,
+                        format!("Failed to parse URI '{}' by rule '{}': regex not match", uri, self.name).as_str()))?;
+
+                let mut i = 0;
+                for group in caps.iter() {
+                    variables.insert(format!("_{i}"), group.unwrap().as_str().to_owned());
+                    i += 1;
+                }
+
+                let named_variables: HashMap<String, String> = re
+                    .capture_names()
+                    .flatten()
+                    .map(|n| (n.to_owned(), caps.name(n).unwrap().as_str().to_owned()))
+                    .collect();
+
+                variables.extend(named_variables);
+
+                for (_, l10n_label) in label.iter_mut() {
+                    *l10n_label = tengine::simple_template_render(&l10n_label, &variables)?;
+                }
+
+                final_uri = tengine::simple_template_render(&final_uri, &variables)?;
+            }
+
+            Ok(Link {
+                label: label,
+                uri: final_uri,
+                rule: Some(self.clone()),
+                variables: variables,
+            })
+        }
     }
 }
 
