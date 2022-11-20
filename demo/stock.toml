@@ -42,6 +42,7 @@ www_href = "https://store.steampowered.com/app/{{ id }}"
 inference = true
 
 [link.steam-demo]
+icon = "site-steam"
 label = { _ = "Get demo version on Steam", zh-cn = "在 Steam 上获取演示版本" }
 regex = "^steam-demo:(?P<id>.*)$"
 www_href = "https://store.steampowered.com/app/{{ id }}"

@@ -1,5 +1,5 @@
-pub mod image;
 pub mod link;
+pub mod media;
 
 pub mod game;
 pub mod author;

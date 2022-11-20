@@ -2,8 +2,9 @@ use std::collections::HashMap;
 
 use anyhow::Result;
 
-use super::raw::{RawGame, RawLinkItem};
+use super::raw::RawGame;
 use super::link::Link;
+use super::media::Media;
 use crate::ContextData;
 use crate::error::{Error, ErrorKind};
 use crate::i18n::LangId;
@@ -15,12 +16,19 @@ pub enum Description {
 }
 
 #[derive(Debug)]
+pub struct GameMedia {
+    pub sensitive: bool,
+    pub media: Media,
+}
+
+#[derive(Debug)]
 pub struct Game {
     pub id: String,
     pub name: String,
     pub description: Description,
     pub brief_description: Option<String>,
     pub links: Vec<Link>,
+    pub medias: Vec<GameMedia>,
 
     pub l10n: HashMap<LangId, GameL10n>,
 }
@@ -32,8 +40,7 @@ pub struct GameL10n {
 }
 
 impl Game {
-    pub fn build(data: &ContextData, id: String, raw_game: RawGame) -> Result<Self> {
-
+    pub fn build(data: &ContextData, id: String, mut raw_game: RawGame) -> Result<Self> {
         let description = match raw_game.description_format {
             Some(format) => {
                 match format.as_str() {
@@ -50,6 +57,12 @@ impl Game {
             .map(|raw_link| data.link_rules.build_link(raw_link))
             .collect();
         let links = links?;
+        
+        let medias = raw_game.screenshots
+            .into_iter()
+            .map(|sh| {
+                GameMedia { sensitive: sh.is_sensitive(), media: sh.into() }
+            }).collect();
 
         Ok(Self {
             id: id,
@@ -57,6 +70,7 @@ impl Game {
             description: description,
             brief_description: raw_game.brief_description,
             links: links,
+            medias: medias,
 
             l10n: HashMap::new(),
         })

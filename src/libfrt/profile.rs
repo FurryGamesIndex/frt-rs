@@ -1,8 +1,10 @@
-use std::{path::Path, collections::HashMap};
+use std::collections::HashMap;
 
 use serde::Deserialize;
 use toml::Value;
 use anyhow::Result;
+
+use crate::utils;
 
 #[derive(Deserialize, Debug)]
 #[serde(default)]
@@ -33,8 +35,13 @@ impl Default for Profile {
 }
 
 impl Profile {
-    pub fn from_config(fpath: &str) -> Result<Self> {
-        let buffer = std::fs::read_to_string(fpath)?;
-        Ok(toml::from_str(&buffer)?)
+    pub fn from_configs(configs: Vec<&str>) -> Result<Self> {
+        let mut data: toml::Value = toml::from_str("")?;
+
+        for config in configs.iter() {
+            utils::toml::merge(&mut data, toml::from_str(config)?);
+        }
+
+        Ok(Profile::deserialize(data)?)
     }
 }

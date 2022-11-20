@@ -19,6 +19,7 @@ pub struct Link {
 }
 
 #[derive(Deserialize, Default, Debug)]
+#[serde(default)]
 pub struct StockLinkRule {
     pub name: String,
     pub icon: String,

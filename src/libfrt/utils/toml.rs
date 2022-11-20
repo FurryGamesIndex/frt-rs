@@ -11,7 +11,7 @@ use toml::Value;
 /// 
 /// let s = T::deserialize(a).unwrap();
 /// ```
-fn merge(a: &mut Value, b: Value) {
+pub fn merge(a: &mut Value, b: Value) {
     match (a, b) {
         (a @ &mut Value::Table(_), Value::Table(b)) => {
             let a = a.as_table_mut().unwrap();

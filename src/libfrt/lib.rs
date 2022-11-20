@@ -1,17 +1,22 @@
 pub mod entries;
 pub mod profile;
+pub mod backend;
 pub mod i18n;
 pub mod utils;
 pub mod error;
 
+#[macro_use] extern crate log;
+
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
+use std::rc::Rc;
 use anyhow::Result;
 
 use entries::raw::RawStockConfig;
 use entries::{game::Game, author::Author};
 use entries::link::LinkRuleManager;
+use backend::{Backend, www::BackendWWW};
 use profile::Profile;
 use error::{Error, ErrorKind};
 
@@ -71,9 +76,10 @@ impl ContextData {
     }
 }
 
-#[derive(Default)]
 pub struct Context {
     pub profile: Profile,
+
+    pub(crate) backend: Option<Rc<dyn Backend>>,
 
     pub(crate) data: ContextData,
 }
@@ -83,12 +89,17 @@ impl Context {
         Self {
             profile: profile,
 
+            // Currently we are only supporting the `www` backend.
+            // So, we hard-code the backend here.
+            backend: Some(Rc::from(BackendWWW::new())),
+
             data: ContextData::default(),
         }
     }
 
     pub fn load_games(&mut self) -> Result<()> {
         for i in self.profile.path_games.iter() {
+            info!("Loading game dir: {i}");
             let paths = fs::read_dir(i)?;
             for path in paths {
                 let path = path?.path();
@@ -101,6 +112,7 @@ impl Context {
 
     pub fn load_authors(&mut self) -> Result<()> {
         for i in self.profile.path_authors.iter() {
+            info!("Loading author dir: {i}");
             let paths = fs::read_dir(i)?;
             for path in paths {
                 let path = path?.path();
@@ -115,6 +127,7 @@ impl Context {
 
     pub fn load_config(&mut self) -> Result<()> {
         for i in &self.profile.stock_config {
+            info!("Loading stock config '{i}'");
             self.data.load_stock(Path::new(i))?;
         }
 
@@ -122,6 +135,7 @@ impl Context {
     }
 
     pub fn init(&mut self) -> Result<()> {
+        info!("Context initializing");
         self.load_config()?;
         Ok(())
     }
@@ -131,5 +145,9 @@ impl Context {
         self.load_authors()?;
         self.load_games()?;
         Ok(())
+    }
+
+    pub fn invoke_backend(&self) -> Result<()> {
+        todo!()
     }
 }

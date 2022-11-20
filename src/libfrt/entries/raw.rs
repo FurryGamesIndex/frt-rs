@@ -48,7 +48,27 @@ pub enum RawScreenshotItem {
         youtube: String,
     },
     Video {
+        #[serde(default)]
+        sensitive: bool,
         video: Vec<RawVideoSourceItem>,
+    },
+    HBox {
+        #[serde(default)]
+        sensitive: bool,
+        medias: Vec<RawScreenshotItem>,
+    }
+}
+
+impl RawScreenshotItem {
+    pub fn is_sensitive(&self) -> bool {
+        match self {
+            RawScreenshotItem::SimpleImage(_) => false,
+            RawScreenshotItem::Youtube { .. } => false,
+
+            RawScreenshotItem::Image { sensitive, .. } => *sensitive,
+            RawScreenshotItem::Video { sensitive, .. } => *sensitive,
+            RawScreenshotItem::HBox { sensitive, .. } => *sensitive,
+        }
     }
 }
 
