@@ -16,7 +16,7 @@ use anyhow::Result;
 use entries::raw::RawStockConfig;
 use entries::{game::Game, author::Author};
 use entries::link::LinkRuleManager;
-use backend::{Backend, www::BackendWWW};
+use backend::{Backend, BackendArguments, www::BackendWWW};
 use profile::Profile;
 use error::{Error, ErrorKind};
 
@@ -50,6 +50,7 @@ impl ContextData {
     }
 
     pub fn load_game(&mut self, path: &Path) -> Result<()> {
+        info!("Loading {}", path.display());
         let game = self.build_game(path)?;
         self.games.insert(game.id.to_owned(), game);
         Ok(())
@@ -85,16 +86,19 @@ pub struct Context {
 }
 
 impl Context {
-    pub fn new(profile: Profile) -> Self {
-        Self {
+    pub fn new(mut profile: Profile) -> Result<Self> {
+        let backend_profile_value = profile.backends.remove("www");
+        profile.backends.clear();
+
+        Ok(Self {
             profile: profile,
 
             // Currently we are only supporting the `www` backend.
             // So, we hard-code the backend here.
-            backend: Some(Rc::from(BackendWWW::new())),
+            backend: Some(Rc::from(BackendWWW::new(backend_profile_value)?)),
 
             data: ContextData::default(),
-        }
+        })
     }
 
     pub fn load_games(&mut self) -> Result<()> {
@@ -103,9 +107,13 @@ impl Context {
             let paths = fs::read_dir(i)?;
             for path in paths {
                 let path = path?.path();
-                self.data.load_game(&path)?;
+                if path.is_dir() {
+                    self.data.load_game(&path)?;
+                }
             }
         }
+
+        info!("{} games Loaded", self.data.games.len());
 
         Ok(())
     }
@@ -147,7 +155,7 @@ impl Context {
         Ok(())
     }
 
-    pub fn invoke_backend(&self) -> Result<()> {
-        todo!()
+    pub fn invoke_backend(&self, args: BackendArguments) -> Result<BackendArguments> {
+        self.backend.as_ref().unwrap().render(&self.profile, &self.data, args)
     }
 }

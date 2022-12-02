@@ -38,7 +38,9 @@ struct Cli {
 }
 
 fn main() -> Result<()> {
-    std::env::set_var("RUST_BACKTRACE", "full");
+    if std::env::var("RUST_BACKTRACE").is_err() {
+        std::env::set_var("RUST_BACKTRACE", "full");
+    }
 
     if std::env::var("FRT_LOG").is_err() {
         std::env::set_var("FRT_LOG", "info");

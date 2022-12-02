@@ -101,8 +101,6 @@ impl LinkRuleManager {
         self.rules.insert(rule.name.to_owned(), rule.clone());
 
         if !rule.passthrough && rule.inference {
-            let x = rule.regex.as_ref();
-
             let regex = rule.regex.as_ref().ok_or_else(|| Error::new(
                 ErrorKind::InvalidArgument,
                 "StockLink: regex is required for inference rule"))?
