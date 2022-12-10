@@ -17,6 +17,7 @@ use entries::raw::RawStockConfig;
 use entries::{game::Game, author::Author};
 use entries::link::LinkRuleManager;
 use backend::{Backend, BackendArguments, www::BackendWWW};
+use i18n::LangId;
 use profile::Profile;
 use error::{Error, ErrorKind};
 
@@ -26,6 +27,8 @@ pub struct ContextData {
     pub games: HashMap<String, Game>,
 
     pub link_rules: LinkRuleManager,
+
+    pub ui: HashMap<LangId, toml::Value>,
 }
 
 impl ContextData {
@@ -71,6 +74,40 @@ impl ContextData {
         for (rule_name, mut rule) in stock_config.link.drain() {
             rule.name = rule_name;
             self.link_rules.add_rule(rule)?;
+        }
+
+        Ok(())
+    }
+
+    pub fn load_ui(&mut self, file: &Path) -> Result<()> {
+        let content = std::fs::read_to_string(file)?;
+        self.ui.entry(LangId::default()).or_insert(toml::from_str("")?);
+        utils::toml::merge(self.ui.get_mut(&LangId::default()).unwrap(), toml::from_str(content.as_str())?);
+        Ok(())
+    }
+
+    pub fn post_load_ui(&mut self) -> Result<()> {
+        let mut orig_ui = self.ui.remove(&LangId::default()).unwrap();
+
+        match &mut orig_ui {
+            toml::Value::Table(table) => {
+                let low_ui = table.remove("_").ok_or_else(||
+                    Error::new(ErrorKind::InvalidArgument, 
+                        "The '_' entry was not found in ui config"))?;
+
+                for (lang, value) in table.iter() {
+                    let mut v = low_ui.clone();
+
+                    // unexcepted memcpy, but seems no `drain()` for toml::Map
+                    utils::toml::merge(&mut v, value.clone());
+
+                    self.ui.insert(lang.as_str().into(), v);
+                }
+
+                self.ui.entry(LangId::default()).or_insert(low_ui);
+            },
+            _ => return Err(Error::new(ErrorKind::InvalidArgument, 
+                "Invalid ui config format").into()),
         }
 
         Ok(())
@@ -138,6 +175,13 @@ impl Context {
             info!("Loading stock config '{i}'");
             self.data.load_stock(Path::new(i))?;
         }
+
+        for i in &self.profile.ui_config {
+            info!("Loading ui config '{i}'");
+            self.data.load_ui(Path::new(i))?;
+        }
+
+        self.data.post_load_ui()?;
 
         Ok(())
     }
