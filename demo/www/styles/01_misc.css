@@ -1,0 +1,142 @@
+* {
+	box-sizing: border-box !important;
+	word-break: break-word; /* Bad idea, but it will make Safari happy :-( */
+}
+
+body {
+	margin: 0;
+
+	color: var(--primary-text-color);
+	background-color: var(--primary-background-color);
+
+	font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+
+	font-size: 16px;
+	line-height: 1.5;
+
+	-webkit-text-size-adjust: none;
+	text-size-adjust: none;
+}
+
+body:lang(ja),
+body:lang(zh),
+body:lang(zh-CN),
+body:lang(zh-TW) {
+	line-height: 1.625;
+}
+
+a {
+	text-decoration: none;
+	color: var(--accent-text-color);
+}
+
+p a:hover {
+	text-decoration: underline;
+}
+
+a,
+a:hover,
+a:active,
+a:focus {
+	outline: 0;
+}
+
+a:hover {
+	color: var(--accent-text-color-alt);
+}
+
+pre {
+	overflow-x: auto;
+}
+
+code {
+	padding: 2px 4px;
+	background-color: var(--accent-background-color);
+	border-radius: 2px;
+}
+
+
+dl,
+dd {
+	margin: 0;
+}
+
+hr {
+	margin: 0;
+
+	border-style: none;
+	height: 2px;
+	background-clip: content-box;
+	background-color: var(--divider-color);
+}
+
+p {
+	margin: 0;
+	margin-bottom: 7px;
+}
+
+ul {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+
+picture {
+	$flex;
+	$flex_justify_center;
+}
+
+.activated {
+	font-weight: 700;
+}
+
+::selection {
+	color: #ffffff;
+	background-color: var(--selection-background-color);
+}
+
+.small {
+	font-size: 0.875rem;
+}
+
+.hide {
+	display: none !important;
+}
+
+
+span.icon {
+	position: relative;
+}
+
+span.icon>.platform-tooltip {
+	display: none;
+	position: absolute;
+	bottom: -36px;
+	left: 50%;
+	transform: translateX(-50%);
+	background-color: rgba(0, 0, 0);
+	box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+	white-space: nowrap;
+	color: #fff;
+	padding: 4px 8px;
+	border-radius: 4px;
+	font-size: 14px;
+	line-height: 1.5;
+}
+
+span.icon>.platform-tooltip::before {
+	content: '';
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 0 4px 4px 4px;
+	border-color: transparent transparent rgba(0, 0, 0) transparent;
+	position: absolute;
+	top: -4px;
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+span.icon:hover>.platform-tooltip {
+	display: block;
+}

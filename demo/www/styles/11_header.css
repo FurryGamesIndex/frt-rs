@@ -1,0 +1,45 @@
+header {
+	align-self: stretch;
+	$flex;
+	$flex_column_nowrap;
+	$flex_items_center;
+}
+
+header nav {
+	width: 100%;
+	min-height: 48px;
+	$flex;
+	$flex_row_wrap;
+	$flex_items_center;
+	-webkit-justify-content: space-between;
+	justify-content: space-between;
+	padding-top: 16px;
+}
+
+header nav .title {
+	font-size: 1.25rem;
+}
+
+header h3 {
+	margin-right: $main_column_gap;
+	margin-bottom: 8px;
+}
+
+header ul {
+	$flex;
+	$flex_row_wrap;
+	$flex_items_center;
+}
+
+header li {
+	margin: 4px 0;
+}
+
+header li:not(:last-of-type) {
+	margin-right: $alt_row_gap;
+}
+
+header .iconline > .icon {
+	font-size: 1.125em;
+	margin-right: 8px;
+}

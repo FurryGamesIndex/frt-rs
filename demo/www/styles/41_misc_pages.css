@@ -1,0 +1,110 @@
+.main_author {
+	margin-top: $main_column_gap;
+}
+
+.main_author hr {
+	margin: $alt_row_gap 0;
+}
+
+.main_author .author_head {
+	$flex;
+	$flex_row_nowrap;
+	$flex_items_center;
+}
+
+.main_author .author_head .avatar {
+	margin-right: 20px;
+	width: 48px;
+	height: 48px;
+}
+
+.main_author h1 {
+	font-size: 1.5rem;
+	margin: 0;
+}
+
+.main_author .author_aliases {
+	margin: 6px 0 0 68px;
+}
+
+
+.main_simple_markdown {
+	margin: $main_column_gap 0;
+	line-height: 1.49
+}
+
+.main_simple_markdown p {
+	margin: 1em 0;
+}
+
+.main_simple_markdown table {
+	border: 1px solid var(--accent-text-color);
+	border-collapse: collapse;
+}
+
+.main_simple_markdown table td {
+	padding: 7px $alt_row_gap;
+}
+
+.main_simple_markdown tbody>tr:nth-child(odd) {
+	background-color: var(--accent-background-color);
+}
+
+.main_simple_markdown code {
+	font-size: .94em;
+	padding: 2px 4px;
+	background-color: var(--accent-background-color);
+	border-radius: 2px;
+}
+
+
+.main_preferences {
+	margin: $main_column_gap 0;
+}
+
+.main_preferences article,
+.main_preferences hr {
+	margin-top: $main_column_gap;
+}
+
+.main_preferences h2 {
+	margin-bottom: $main_column_gap;
+}
+
+.main_preferences .note {
+	margin: $main_row_gap 0 0 26px;
+}
+
+
+.main_search {
+	margin-top: $main_column_gap;
+}
+
+.main_search #search_mode {
+	min-height: 26px;
+}
+
+.main_search #search_wrap {
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: flex-start;
+	align-items: center;
+	margin-bottom: 8px;
+}
+
+.main_search #search_value {
+	line-height: 1.4;
+	min-height: 26px;
+	max-width: 400px;
+	margin: 5px 6px 0 0;
+	flex: 1 0 auto;
+}
+
+.main_search #search_info {
+	margin: $main_row_gap 0;
+}
+
+
+.main_generic {
+	margin: $main_column_gap 0;
+}

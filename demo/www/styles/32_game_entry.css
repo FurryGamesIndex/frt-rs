@@ -1,0 +1,184 @@
+.game_entry .thumbnail {
+	width: 100%;
+	max-width: $thumbnail_max_width;
+	height: auto;
+}
+
+.game_entry hr {
+	margin: $alt_row_gap 0;
+}
+
+.game_entry .game_name {
+	margin: 0;
+	font-weight: 700;
+	font-size: 2.125rem;
+}
+
+.game_entry .description {
+	margin-bottom: $main_column_gap;
+}
+
+.game_entry .description ul {
+	padding-left: 40px;
+	margin: 1em 0;
+	list-style-type: initial;
+}
+
+.game_entry .media > *:not(picture),
+.game_entry .media img,
+.game_entry .description img {
+	margin-bottom: 16px;
+	width: 100%;
+	max-width: 100%;
+}
+
+.game_entry .media > .hbox {
+	$flex;
+	$flex_row_nowrap;
+	$flex_justify_space_between;
+}
+
+.game_entry .media > .hbox > * {
+	$flex_grow_1x;
+}
+
+.game_entry .tags {
+	-moz-column-count: 2;
+	-webkit-column-count: 2;
+	column-count: 2;
+	-moz-column-gap: $main_column_gap;
+	-webkit-column-gap: $main_column_gap;
+	column-gap: $main_column_gap;
+}
+
+.game_entry .tags > div {
+	$flex;
+	$flex_row_wrap;
+	$flex_items_start;
+
+	margin-bottom: 8px;
+
+	break-inside: avoid-column;
+}
+
+/* workarouds for Firefox */
+@supports not (break-inside: avoid-column) {
+	.game_entry .tags > div {
+		page-break-inside: avoid;
+		overflow: hidden;
+	}
+}
+
+.game_entry .tags dt {
+	-webkit-flex-basis: 100%;
+	flex-basis: 100%;
+	margin-bottom: 4px;
+}
+
+.game_entry .tags dd {
+	$flex_inline;
+	margin: 0;
+	margin-bottom: 4px;
+}
+
+.game_entry .tags dd:not(:last-of-type) {
+	margin-right: 4px;
+}
+
+.game_entry .tags dd > a {
+	padding: 0px 4px;
+	border: 1px solid currentColor;
+}
+
+.game_entry .staff:empty {
+	display: none;
+}
+
+.game_entry .staff {
+	-moz-column-count: 2;
+	-webkit-column-count: 2;
+	column-count: 2;
+	-moz-column-gap: $main_column_gap;
+	-webkit-column-gap: $main_column_gap;
+	column-gap: $main_column_gap;
+
+	margin-bottom: $main_column_gap;
+}
+
+.game_entry .staff li {
+	$flex;
+	$flex_row_nowrap;
+	$flex_items_center;
+
+	padding: 6.5px 0;
+
+	break-inside: avoid-column;
+}
+
+/* workarouds for Firefox */
+@supports not (break-inside: avoid-column) {
+	.game_entry .staff li {
+		page-break-inside: avoid;
+		overflow: hidden;
+	}
+}
+
+.game_entry .staff li > span {
+	$flex;
+	$flex_column_nowrap;
+}
+
+.game_entry .staff .avatar {
+	width: 40px;
+	height: 40px;
+
+	margin-right: $main_row_gap;
+
+	$flex_shrink_off;
+}
+
+.game_entry .staff .roles {
+	$flex;
+	$flex_row_wrap;
+}
+
+.game_entry .staff .roles > span:not(:last-of-type) {
+	margin-right: 8px;
+}
+
+.game_entry .platforms {
+	$flex;
+	$flex_row_wrap;
+	$flex_items_center;
+	$flex_justify_end;
+
+	padding: 8px 0;
+	margin-top: 8px;
+}
+
+.game_entry .platforms .icon {
+	font-size: 1.25rem;
+	margin-left: 0.2em;
+}
+
+$screen_mobile_l3 {
+	.game_entry .game_name {
+		font-size: 1.5rem;
+	}
+
+	.game_entry .tags,
+	.game_entry .staff {
+		-moz-column-count: auto;
+		-webkit-column-count: auto;
+		column-count: auto;
+	}
+
+	.game_entry .media > .hbox {
+		$flex_column_nowrap;
+		$flex_justify_start;
+	}
+
+	.game_entry .media > .hbox > * {
+		$flex_grow_off;
+	}
+}

@@ -1,0 +1,35 @@
+:root {
+	--primary-text-color: rgba(0, 0, 0, 0.87);
+	--secondary-text-color-alt: rgba(0, 0, 0, 0.7);
+	--secondary-text-color: rgba(0, 0, 0, 0.54);
+	--hint-text-color: rgba(0, 0, 0, 0.38);
+	--hint-text-color-alt: rgba(0, 0, 0, 0.2);
+	--divider-color: rgba(0, 0, 0, 0.12);
+	--accent-text-color: $color-light-blue-900;
+	--accent-text-color-alt: $color-light-blue-700;
+	--activated-text-color: $color-light-blue-800;
+	--primary-background-color: $color-grey-50;
+	--secondary-background-color: $color-blue-grey-50;
+	--accent-background-color: $color-blue-grey-50;
+	--warning-text-color: $color-deep-orange-a700;
+	--selection-background-color: $color-blue-grey-500;
+	--bar-icon-color: $color-blue-grey-500;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--primary-text-color: rgba(255, 255, 255, 1);
+		--secondary-text-color-alt: rgba(255, 255, 255, 0.87);
+		--secondary-text-color: rgba(255, 255, 255, 0.7);
+		--hint-text-color: rgba(255, 255, 255, 0.5);
+		--hint-text-color-alt: rgba(255, 255, 255, 0.38);
+		--divider-color: rgba(255, 255, 255, 0.12);
+		--accent-text-color: $color-light-blue-600;
+		--accent-text-color-alt: $color-light-blue-400;
+		--activated-text-color: $color-light-blue-500;
+		--primary-background-color: $color-grey-900;
+		--secondary-background-color: $color-blue-grey-950;
+		--accent-background-color: $color-blue-grey-800;
+		--warning-text-color: $color-deep-orange-a400;
+	}
+}
