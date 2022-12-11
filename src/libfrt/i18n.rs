@@ -5,7 +5,7 @@ pub enum LangId {
     EnUs,
     ZhCn,
     ZhTw,
-    Ja
+    JaJp,
 }
 
 impl Default for LangId {
@@ -19,7 +19,7 @@ impl From<&str> for LangId {
         match s {
             "zh-cn" | "zh" => LangId::ZhCn,
             "zh-tw" => LangId::ZhTw,
-            "ja-jp" | "ja" => LangId::Ja,
+            "ja-jp" | "ja" => LangId::JaJp,
             _ => LangId::EnUs,
         }
     }
@@ -27,36 +27,53 @@ impl From<&str> for LangId {
 
 impl<'de> Deserialize<'de> for LangId {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where D: serde::Deserializer<'de> {
+    where
+        D: serde::Deserializer<'de>,
+    {
         let s = String::deserialize(deserializer)?;
         Ok(s.as_str().into())
     }
 }
 
 impl LangId {
-    pub fn as_unix(&self) -> &'static str {
+    pub fn tag(&self) -> (&'static str, &'static str, bool) {
         match self {
-            LangId::EnUs => "en_US",
-            LangId::ZhCn => "zh_CN",
-            LangId::ZhTw => "zh_TW",
-            LangId::Ja => "ja",
+            LangId::EnUs => ("en", "us", true),
+            LangId::ZhCn => ("zh", "cn", false),
+            LangId::ZhTw => ("zh", "tW", false),
+            LangId::JaJp => ("ja", "jp", true),
         }
     }
 
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            LangId::EnUs => "en-us",
-            LangId::ZhCn => "zh-cn",
-            LangId::ZhTw => "zh-tw",
-            LangId::Ja => "ja",
+    pub fn as_unix(&self) -> String {
+        let (l, r, _) = self.tag();
+        format!("{}_{}", l, r.to_uppercase())
+    }
+
+    pub fn as_bcp47(&self) -> String {
+        let (l, r, _) = self.tag();
+        format!("{}-{}", l, r.to_uppercase())
+    }
+
+    pub fn as_bcp47_short(&self) -> String {
+        let (l, r, s) = self.tag();
+        if s {
+            l.into()
+        } else {
+            format!("{}-{}", l, r.to_uppercase())
         }
     }
 
-    pub fn as_str_without_region(&self) -> &'static str {
-        match self {
-            LangId::EnUs => "en",
-            LangId::ZhCn | LangId::ZhTw => "zh",
-            LangId::Ja => "ja",
+    pub fn as_str(&self) -> String {
+        let (l, r, s) = self.tag();
+        if s {
+            l.into()
+        } else {
+            format!("{}-{}", l, r)
         }
+    }
+
+    pub fn as_str_noregion(&self) -> &'static str {
+        self.tag().0
     }
 }

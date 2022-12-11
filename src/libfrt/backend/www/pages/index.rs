@@ -19,10 +19,11 @@ impl PageIndex {
 
 impl Page for PageIndex {
     fn render(&self, rcontext: &RenderContext) -> Result<PageRenderOutput> {
-        let tera_context = rcontext.make_common_tera_context()?;
+        let mut tera_context = rcontext.make_common_tera_context()?;
+        tera_context.insert("rr", "..");
 
         let s = rcontext.tera.render("index.html", &tera_context)?;
-        
+
         Ok(PageRenderOutput::single_page(
             format!("{}/index.html", rcontext.lang.as_str()), s))
     }

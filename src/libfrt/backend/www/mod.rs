@@ -1,5 +1,6 @@
 mod profile;
 mod pages;
+mod stylesheet;
 
 use std::collections::HashMap;
 use std::path::Path;
@@ -7,12 +8,14 @@ use std::path::Path;
 use anyhow::Result;
 
 use profile::ProfileWWW;
+use stylesheet::Stylesheets;
 use pages::{Page, index::PageIndex, PageRenderOutput};
 use super::{Backend, BackendArguments};
 use crate::error::{Error, ErrorKind};
 use crate::ContextData;
 use crate::profile::Profile;
 use crate::i18n::LangId;
+use crate::utils::fs::{copy_dir, get_mtime, ensure_dir};
 
 struct RenderContext<'a> {
     data: &'a ContextData,
@@ -27,6 +30,10 @@ impl RenderContext<'_> {
         let mut tera_context = tera::Context::new();
 
         tera_context.insert("ui", ui);
+        tera_context.insert("lang", &self.lang.as_str());
+        tera_context.insert("lang_without_region", &self.lang.as_str_noregion());
+        tera_context.insert("lang_unix_style", &self.lang.as_unix());
+        tera_context.insert("lang_bcp47", &self.lang.as_bcp47_short());
 
         Ok(tera_context)
     }
@@ -36,6 +43,7 @@ pub struct BackendWWW {
     pub profile: ProfileWWW,
     pub tera: tera::Tera,
 
+    stylesheets: Stylesheets,
     pages: HashMap<String, Box<dyn Page>>,
 }
 
@@ -74,6 +82,75 @@ impl tera::Function for TeraIconFactory {
     }
 }
 
+struct TeraRes {
+    pub profile: ProfileWWW,
+    pub stylesheets: Stylesheets,
+}
+
+impl TeraRes {
+    fn find_local_file(&self, dir: &Vec<String>, rr: &str, file: &str, output_prefix: &str) -> Result<String> {
+        for i in dir.iter().rev() {
+            let p = Path::new(i).join(file);
+            if p.is_file() {
+                let mtime = get_mtime(p)?;
+
+                return Ok(format!("{}/{}{}?hc=uquery&t={}", rr, output_prefix, file, mtime).into());
+            }
+        }
+
+        Err(Error::new(ErrorKind::NotExist, "File not found").into())
+    }
+
+    fn find_stylesheet_file(&self, rr: &str, file: &str) -> Result<String> {
+        match self.stylesheets.sheets.get(file) {
+            Some(ss) => {
+                Ok(format!("{}/{}?hc=uquery&t={}", rr, file, ss.mtime).into())
+            },
+            None => Err(Error::new(ErrorKind::NotExist, "File not found").into()),
+        }
+    }
+}
+
+impl tera::Function for TeraRes {
+    fn call(&self, args: &HashMap<String, tera::Value>) -> tera::Result<tera::Value> {
+        let rr = match args.get("rr") {
+            Some(var) => var.as_str().unwrap_or(""),
+            None => "",
+        };
+
+        let scope = match args.get("scope") {
+            Some(var) => var.as_str().unwrap_or(""),
+            None => "",
+        };
+
+        let file = match args.get("path") {
+            Some(var) => match var.as_str() {
+                Some(s) => s,
+                None => return Err("Argument 'path' should be str".into()),
+            }
+            None => return Err("Argument 'path' should not be empty".into()),
+        };
+
+        let rf = match scope {
+            "" | "root" => {
+                self.find_local_file(&self.profile.path_static_layers, rr, file, "")
+            },
+            "icons" => {
+                self.find_local_file(&self.profile.path_icon, rr, file, "icons/")
+            },
+            "styles" => {
+                self.find_stylesheet_file(rr, file)
+            },
+            _ => return Err("Argument 'scope' should be str".into()),
+        };
+
+        match rf {
+            Ok(f) => Ok(f.into()),
+            Err(e) => Err(format!("File not found: {}:{}. Err: {}", scope, file, e).into()),
+        }
+    }
+}
+
 impl BackendWWW {
     pub fn new(value: Option<toml::Value>) -> Result<Self> {
         let mut backend = Self {
@@ -83,12 +160,18 @@ impl BackendWWW {
             },
             tera: tera::Tera::default(),
 
+            stylesheets: Stylesheets::default(),
             pages: HashMap::new(),
         };
 
         for path in backend.profile.path_templates.iter() {
             info!("Loading templates from: {path}");
             backend.tera.extend(&tera::Tera::new(path)?)?;
+        }
+
+        for path in backend.profile.path_stylesheets.iter() {
+            info!("Loading stylesheets from: {path}");
+            backend.stylesheets.extend(Stylesheets::from_path(Path::new(path))?);
         }
 
         let mut ifac = TeraIconFactory::default();
@@ -99,8 +182,13 @@ impl BackendWWW {
 
             ifac.icons = serde_json::from_str(&json)?;
         }
-
         backend.tera.register_function("icon", ifac);
+
+        let res = TeraRes {
+            profile: backend.profile.clone(),
+            stylesheets: backend.stylesheets.clone(),
+        };
+        backend.tera.register_function("res", res);
 
         backend.pages.insert("index".to_string(), Box::new(PageIndex::new()));
 
@@ -123,8 +211,6 @@ impl Backend for BackendWWW {
 
         let output_dir = Path::new(&output_dir);
 
-        let output_dir = Path::new(&output_dir);
-
         if std::fs::metadata(&output_dir).is_ok() {
             std::fs::remove_dir_all(&output_dir)?;
         }
@@ -140,6 +226,7 @@ impl Backend for BackendWWW {
 
         let mut output = PageRenderOutput::default();
 
+        info!("Render starting");
         for lang in render_context.data.ui.keys() {
             render_context.lang = lang.clone();
 
@@ -159,10 +246,34 @@ impl Backend for BackendWWW {
             });
         }
 
+        for src in self.profile.path_static_layers.iter() {
+            info!("Copy static layer '{}'", src);
+            copy_dir(src, output_dir)?;
+        }
+
+        for src in self.profile.path_icon.iter() {
+            info!("Copy icon layer '{}'", src);
+            let output_dir = output_dir.join("icons");
+            copy_dir(src, output_dir)?;
+        }
+
+        for (fnm, f) in self.stylesheets.sheets.iter() {
+            info!("Write stylesheet '{}'", fnm);
+
+            let p = output_dir.join(fnm);
+            ensure_dir(&p)?;
+
+            std::fs::write(p, &f.contents)?;
+        }
+
+        info!("Write generated files");
         for (fnm, file) in output.pages.iter() {
             match file {
                 pages::File::Regular(contents) => {
-                    std::fs::write(output_dir.join(fnm), contents)?;
+                    let f = output_dir.join(fnm);
+                    ensure_dir(&f)?;
+
+                    std::fs::write(f, contents)?;
                 },
                 pages::File::Symlink(original) => {
                     #[cfg(unix)]

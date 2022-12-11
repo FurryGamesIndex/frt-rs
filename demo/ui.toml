@@ -1,3 +1,45 @@
 [_.main]
 title = "Furry Games Index"
 description = "A project to index furry & kemono games."
+
+[_.footer]
+tip = "Found something missing or wrong? want to add new games? Or want to improve FurryGamesIndex? <a href=\"https://github.com/FurryGamesIndex/games/tree/master/.github/CONTRIBUTING.md\">Get Involved</a> now!"
+copyright = "Copyright The FurryGamesIndex project, The data on this site is licensed under <a href=\"https://creativecommons.org/licenses/by-nc-sa/4.0/\">CC-BY-NC-SA 4.0</a>. The copyright of some data (such as game screenshots) belongs to the original owner. We only release them under the premise of <a href=\"https://en.wikipedia.org/wiki/Fair_use\">fair use</a>."
+preferences = "Site Preferences"
+privacy_policy = "Privacy Policy"
+oss = "Powered by Open-source softwares"
+rss = "RSS Feed"
+rss_desc = "RSS Feed will push the 50 most recent game entries added to FGI in chronological order."
+contact_us = "Contact FurryGamesIndex project by"
+
+[_.seo]
+base_keywords = "furry, game, kemono"
+kwd_gay = "gay, bara"
+kwd_yiff = "yiff, nsfw, sexual, adult"
+kwd_vn = "visual novel"
+
+[_.index]
+header1 = "FurryGamesIndex"
+header2 = "Find the best furry & kemono games"
+
+content = """
+  <p>FGI (short for FurryGamesIndex) is a project to collect, organize, classify, tag games which are "furry games" or include furry and/or kemono contents. Also collect third-party localized resource links for these games.</p>
+  <p>The motive for creating this project was that Lucky Doge gave up his <a href="https://doge.im/recommend/kemono-games.html">Furry Game Collection</a> project, and Utopic Panther once benefited from the project of Lucky Doge, and trying to rebuild a game collection on the Internet. Lucky Doge <a href="https://github.com/FurryGamesIndex/games/blob/master/luckydoge.txt">generously provided the results that he had made a lot of hard work</a>, making it possible for this project to quickly develop into a practical list.</p>
+  <p>We want you to be part of this project. <a href="https://github.com/FurryGamesIndex/games/tree/master/.github/CONTRIBUTING.md">get involved now</a>.</p>
+"""
+
+[_.index.links]
+games = "Show all games"
+search = "Search games by text or tags"
+contribute = "Get Involved with us"
+contributors = "Contributors list"
+github = "Github Project"
+tg = "Telegram Channel/Groups"
+
+[_.nav]
+index = "Home"
+list = "All games"
+search = "Search"
+faq = "FAQ"
+contributors = "Contributors"
+languages = "Languages"

@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use anyhow::Result;
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Clone, Debug)]
 #[serde(default)]
 pub struct ProfileWWW {
     pub path_templates: Vec<String>,
@@ -15,7 +15,7 @@ impl Default for ProfileWWW {
         Self {
             path_templates: vec![String::from("www/templates/**/*")],
             path_static_layers: vec![String::from("www/root")],
-            path_stylesheets: vec![String::from("www/stylesheets")],
+            path_stylesheets: vec![String::from("www/styles")],
             path_icon: vec![String::from("www/icons/build")],
         }
     }

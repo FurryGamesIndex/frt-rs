@@ -127,6 +127,8 @@ impl Context {
         let backend_profile_value = profile.backends.remove("www");
         profile.backends.clear();
 
+        info!("Backend initializing");
+
         Ok(Self {
             profile: profile,
 
@@ -167,6 +169,8 @@ impl Context {
             }
         }
 
+        info!("{} authors Loaded", self.data.authors.len());
+
         Ok(())
     }
 
@@ -200,6 +204,8 @@ impl Context {
     }
 
     pub fn invoke_backend(&self, args: BackendArguments) -> Result<BackendArguments> {
-        self.backend.as_ref().unwrap().render(&self.profile, &self.data, args)
+        let result = self.backend.as_ref().unwrap().render(&self.profile, &self.data, args);
+        info!("Render done");
+        result
     }
 }
