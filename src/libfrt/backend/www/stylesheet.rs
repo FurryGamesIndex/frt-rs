@@ -2,6 +2,7 @@ use std::{collections::HashMap, path::Path};
 
 use anyhow::Result;
 use serde::Deserialize;
+use regex::Regex;
 
 use crate::error::{Error, ErrorKind};
 use crate::utils::fs::get_mtime;
@@ -66,7 +67,8 @@ impl Stylesheets {
             }
 
             for (mn, mr) in ss.macros.iter() {
-                content = content.replace(format!("${}", mn).as_str(), mr);
+                let regex = Regex::new(format!(r"\${}([ :;\)])", mn).as_str())?;
+                content = regex.replace_all(content.as_str(), format!("{}$1", mr).as_str()).to_string();
             }
 
             let f = StylesheetFile {

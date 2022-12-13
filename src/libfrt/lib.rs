@@ -53,7 +53,7 @@ impl ContextData {
     }
 
     pub fn load_game(&mut self, path: &Path) -> Result<()> {
-        info!("Loading {}", path.display());
+        info!("Loading game bundle: {}", path.display());
         let game = self.build_game(path)?;
         self.games.insert(game.id.to_owned(), game);
         Ok(())
@@ -204,8 +204,8 @@ impl Context {
     }
 
     pub fn invoke_backend(&self, args: BackendArguments) -> Result<BackendArguments> {
-        let result = self.backend.as_ref().unwrap().render(&self.profile, &self.data, args);
+        let result = self.backend.as_ref().unwrap().render(&self.profile, &self.data, args)?;
         info!("Render done");
-        result
+        Ok(result)
     }
 }

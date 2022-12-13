@@ -55,7 +55,7 @@ pub enum RawScreenshotItem {
     HBox {
         #[serde(default)]
         sensitive: bool,
-        medias: Vec<RawScreenshotItem>,
+        hbox: Vec<String>,
     }
 }
 

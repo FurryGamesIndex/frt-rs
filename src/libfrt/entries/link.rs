@@ -3,17 +3,18 @@ use std::rc::Rc;
 
 use anyhow::Result;
 use regex::Regex;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use crate::utils::tengine;
 
 use super::raw::RawLinkItem;
 use crate::i18n::LangId;
 use crate::error::{Error, ErrorKind};
 
-#[derive(Debug)]
+#[derive(Serialize, Debug)]
 pub struct Link {
     pub label: HashMap<LangId, String>,
     pub uri: String,
+    #[serde(skip)]
     pub rule: Option<Rc<StockLinkRule>>,
     pub variables: HashMap<String, String>,
 }
@@ -116,6 +117,31 @@ impl LinkRuleManager {
             RawLinkItem::Custom { name, uri } => {
                 if name.starts_with('.') { // stock link hint
                     let rule_name = &name[1..];
+
+                    match self.rules.get(rule_name) {
+                        Some(rule) => {
+                            if !rule.match_uri(uri.as_str()) {
+                                return Err(Error::new(ErrorKind::InvalidArgument, 
+                                    format!("URI '{uri}' not matchs rule '{rule_name}'").as_str()).into())
+                            }
+
+                            rule.build_link(uri.as_str())?
+                        },
+                        None => {
+                            error!("impl LinkRuleManager: fn build_link(): STUB!"); /* TODO */
+                            error!("Required stock link rule: {}", rule_name);
+                            Link {
+                                label: HashMap::from([
+                                    (LangId::default(), "Unimplemented stock link".into())
+                                ]),
+                                uri: uri.to_owned(),
+                                rule: None,
+                                variables: HashMap::new(),
+                            }
+                        },
+                    }
+
+                    /* TODO: Revert to below codes after old data migration/transition
                     let rule = self.rules.get(rule_name)
                         .ok_or_else(|| Error::new(ErrorKind::NotExist, 
                             format!("Link rule '{rule_name}' not found").as_str()))?;
@@ -125,7 +151,7 @@ impl LinkRuleManager {
                             format!("URI '{uri}' not matchs rule '{rule_name}'").as_str()).into())
                     }
 
-                    rule.build_link(uri.as_str())?
+                    rule.build_link(uri.as_str())?*/
                 } else {
                     Link {
                         label: HashMap::from([( LangId::default(), name )]),

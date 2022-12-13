@@ -1,19 +1,21 @@
+use serde::Serialize;
+
 use super::raw::RawScreenshotItem;
 
-#[derive(Debug)]
+#[derive(Serialize, Debug)]
 pub enum ImageSource {
     LocalShared(String),
     Bundled(String),
     Remote(String),
 }
 
-#[derive(Debug)]
+#[derive(Serialize, Debug)]
 pub struct VideoSource {
     pub mime: String,
     pub uri: String,
 }
 
-#[derive(Debug)]
+#[derive(Serialize, Debug)]
 pub enum Media {
     Image {
         source: ImageSource,
@@ -35,6 +37,12 @@ pub enum Media {
 
 impl<> From<RawScreenshotItem> for Media {
     fn from(_: RawScreenshotItem) -> Self {
-        todo!()
+        error!("impl From<RawScreenshotItem> for Media: fn from(): STUB!"); /* TODO */
+        Self::Image {
+            source: ImageSource::Remote("http://example.com".to_string()),
+            captain: "STUB".to_string(),
+            size: None,
+            mtime: None
+        }
     }
 }

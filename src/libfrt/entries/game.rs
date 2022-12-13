@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use anyhow::Result;
+use serde::Serialize;
 
 use super::raw::RawGame;
 use super::link::Link;
@@ -9,19 +10,19 @@ use crate::ContextData;
 use crate::error::{Error, ErrorKind};
 use crate::i18n::LangId;
 
-#[derive(Debug)]
+#[derive(Serialize, Debug)]
 pub enum Description {
     Plain(String),
     Markdown(String),
 }
 
-#[derive(Debug)]
+#[derive(Serialize, Debug)]
 pub struct GameMedia {
     pub sensitive: bool,
     pub media: Media,
 }
 
-#[derive(Debug)]
+#[derive(Serialize, Debug)]
 pub struct Game {
     pub id: String,
     pub name: String,
@@ -33,7 +34,7 @@ pub struct Game {
     pub l10n: HashMap<LangId, GameL10n>,
 }
 
-#[derive(Debug)]
+#[derive(Serialize, Debug)]
 pub struct GameL10n {
     pub name: Option<String>,
     pub description: Option<Description>,

@@ -1,6 +1,6 @@
 <footer class="small">
 <section>
-	<p>{{ ui.footer.copyright }}</p>
+	<p>{{ ui.footer.copyright|safe }}</p>
 	<p><a href="{{ rr }}/privacy-policy.html">{{ ui.footer.privacy_policy }}</a></p>
 	<p><a href="{{ rr }}/credits.html">{{ ui.footer.oss }}</a></p>
 </section>
@@ -8,17 +8,17 @@
 	<p><a class="iconline" href="{{ rr }}/languages.html">{{ icon(name="language")|safe }}<span>{{ ui.nav.languages }}</span></a></p>
 	<p><a class="iconline" href="{{ rr }}/{{ lang }}/preferences.html">{{ icon(name="settings")|safe }}<span>{{ ui.footer.preferences }}</span></a></p>
 	<p>
-		{{ ui.footer.tip }}
+		{{ ui.footer.tip|safe }}
 	</p>
 	<address>
 		{{ ui.footer.contact_us }}<br>
-		<a href="https://github.com/FurryGamesIndex/games" title="{{ ui.index.links.github }}">
+		<a href="https://github.com/FurryGamesIndex/games" title="{{ ui.links.github }}">
 			{{ icon(scope="site", name="github")|safe }}
 		</a>
 		<a href="mailto:webmaster@furrygames.top" title="webmaster@furrygames.top">
 			{{ icon(name="email")|safe }}
 		</a>
-		<a href="https://t.me/FurryGamesIndex" title="{{ ui.index.links.tg }}">
+		<a href="https://t.me/FurryGamesIndex" title="{{ ui.links.tg }}">
 			{{ icon(scope="site", name="telegram")|safe }}
 		</a>
 	</address>

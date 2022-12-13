@@ -9,7 +9,9 @@ use anyhow::Result;
 
 use profile::ProfileWWW;
 use stylesheet::Stylesheets;
-use pages::{Page, index::PageIndex, PageRenderOutput};
+use pages::{Page, misc::PageMisc, PageRenderOutput};
+use self::pages::list::PageList;
+
 use super::{Backend, BackendArguments};
 use crate::error::{Error, ErrorKind};
 use crate::ContextData;
@@ -190,7 +192,8 @@ impl BackendWWW {
         };
         backend.tera.register_function("res", res);
 
-        backend.pages.insert("index".to_string(), Box::new(PageIndex::new()));
+        backend.pages.insert("misc".to_string(), Box::new(PageMisc::new()));
+        backend.pages.insert("list".to_string(), Box::new(PageList::new()));
 
         Ok(backend)
     }

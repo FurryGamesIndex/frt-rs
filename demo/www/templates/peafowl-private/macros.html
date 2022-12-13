@@ -1,0 +1,3 @@
+{% macro is_page_actived(page) -%}
+    {% if g_active_page is defined and g_active_page == page %}actived{% endif %}
+{%- endmacro is_page_actived %}
