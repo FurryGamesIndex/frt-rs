@@ -1,5 +1,6 @@
 mod profile;
 mod pages;
+mod entries;
 mod stylesheet;
 
 use std::collections::HashMap;
@@ -10,8 +11,8 @@ use anyhow::Result;
 use profile::ProfileWWW;
 use stylesheet::Stylesheets;
 use pages::{Page, misc::PageMisc, PageRenderOutput};
+use self::entries::game::GameWWW;
 use self::pages::list::PageList;
-
 use super::{Backend, BackendArguments};
 use crate::error::{Error, ErrorKind};
 use crate::ContextData;
@@ -20,8 +21,10 @@ use crate::i18n::LangId;
 use crate::utils::fs::{copy_dir, get_mtime, ensure_dir};
 
 struct RenderContext<'a> {
+    games: &'a HashMap<String, GameWWW>,
+
     data: &'a ContextData,
-    args: BackendArguments,
+    args: &'a BackendArguments,
     tera: &'a tera::Tera,
     lang: LangId,
 }
@@ -47,6 +50,9 @@ pub struct BackendWWW {
 
     stylesheets: Stylesheets,
     pages: HashMap<String, Box<dyn Page>>,
+
+    games: HashMap<String, GameWWW>,
+    langs: Vec<LangId>,
 }
 
 #[derive(Default)]
@@ -164,6 +170,9 @@ impl BackendWWW {
 
             stylesheets: Stylesheets::default(),
             pages: HashMap::new(),
+
+            games: HashMap::new(),
+            langs: Vec::new(),
         };
 
         for path in backend.profile.path_templates.iter() {
@@ -200,10 +209,35 @@ impl BackendWWW {
 }
 
 impl Backend for BackendWWW {
+    fn resync(
+        &mut self,
+        profile: &Profile,
+        data: &mut ContextData,
+        args: &BackendArguments
+    ) -> Result<()> {
+        info!("Re-syncing backend data");
+
+        self.langs = data.ui.keys().map(|i| i.to_owned()).collect();
+        if !data.ui.contains_key(&LangId::default()) {
+            self.langs.push(LangId::default());
+        }
+
+        for game in data.games.values_mut() {
+            if game.dirty {
+                self.games.insert(game.id.clone(), GameWWW::from_game(game, &self.langs)?);
+
+                game.dirty = false;
+            }
+        }
+
+        Ok(())
+    }
+
     fn render(
-        &self, profile: &Profile,
+        &self,
+        profile: &Profile,
         data: &ContextData,
-        args: BackendArguments
+        args: &BackendArguments
     ) -> Result<BackendArguments> {
         let mut ret = BackendArguments::new();
 
@@ -219,6 +253,7 @@ impl Backend for BackendWWW {
         }
 
         let mut render_context = RenderContext {
+            games: &self.games,
             data: data,
             args: args,
             tera: &self.tera,
@@ -229,9 +264,9 @@ impl Backend for BackendWWW {
 
         let mut output = PageRenderOutput::default();
 
-        info!("Render starting");
-        for lang in render_context.data.ui.keys() {
+        for lang in self.langs.iter() {
             render_context.lang = lang.clone();
+            info!("Render starting, lang: {}", render_context.lang.as_str());
 
             output.extend(match target {
                 "" => {

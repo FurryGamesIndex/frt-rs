@@ -19,8 +19,8 @@
 {% if noindex is defined and noindex %}
 	<meta name="robots" content="noindex">
 {% endif %}
-	<link rel="stylesheet" href="{{ res(rr=rr, scope='styles', path='styles/peafowl.css') }}">
-	<link rel="stylesheet" href="{{ res(rr=rr, scope='icons', path='icon.css') }}">
+	<link rel="stylesheet" href="{{ res(rr=rr, scope='styles', path='styles/peafowl.css')|safe }}">
+	<link rel="stylesheet" href="{{ res(rr=rr, scope='icons', path='icon.css')|safe }}">
 {% if extra_styles is defined %}
 	<style>{{ extra_styles }}</style>
 {% endif %}

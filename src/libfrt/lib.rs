@@ -32,29 +32,8 @@ pub struct ContextData {
 }
 
 impl ContextData {
-    pub fn build_game(&self, path: &Path) -> Result<Game> {
-        let id = path.file_name()
-            .ok_or_else(|| Error::new(ErrorKind::Other, "Can not get path name"))?
-            .to_str()
-            .ok_or_else(|| Error::new(ErrorKind::Other, "Can not parse path name"))?
-            .to_owned();
-
-        let path_game_yaml = path.join("game.yaml");
-
-        if !path_game_yaml.exists() {
-            return Err(Error::new(ErrorKind::InvalidBundle, "Can not found game.yaml").into())
-        }
-
-        let raw_game = serde_yaml::from_str(&std::fs::read_to_string(path_game_yaml)?)?;
-
-        let game = Game::build(self, id, raw_game)?;
-        
-        Ok(game)
-    }
-
     pub fn load_game(&mut self, path: &Path) -> Result<()> {
-        info!("Loading game bundle: {}", path.display());
-        let game = self.build_game(path)?;
+        let game = Game::from_bundle(self, path)?;
         self.games.insert(game.id.to_owned(), game);
         Ok(())
     }
@@ -117,7 +96,7 @@ impl ContextData {
 pub struct Context {
     pub profile: Profile,
 
-    pub(crate) backend: Option<Rc<dyn Backend>>,
+    pub(crate) backend: Option<Box<dyn Backend>>,
 
     pub(crate) data: ContextData,
 }
@@ -134,7 +113,7 @@ impl Context {
 
             // Currently we are only supporting the `www` backend.
             // So, we hard-code the backend here.
-            backend: Some(Rc::from(BackendWWW::new(backend_profile_value)?)),
+            backend: Some(Box::new(BackendWWW::new(backend_profile_value)?)),
 
             data: ContextData::default(),
         })
@@ -203,8 +182,19 @@ impl Context {
         Ok(())
     }
 
-    pub fn invoke_backend(&self, args: BackendArguments) -> Result<BackendArguments> {
-        let result = self.backend.as_ref().unwrap().render(&self.profile, &self.data, args)?;
+    pub fn resync_backend(&mut self, args: &BackendArguments) -> Result<()> {
+        self.backend
+            .as_mut()
+            .unwrap()
+            .resync(&self.profile, &mut self.data, args)?;
+        Ok(())
+    }
+
+    pub fn invoke_backend(&self, args: &BackendArguments) -> Result<BackendArguments> {
+        let result = self.backend
+            .as_ref()
+            .unwrap()
+            .render(&self.profile, &self.data, args)?;
         info!("Render done");
         Ok(result)
     }

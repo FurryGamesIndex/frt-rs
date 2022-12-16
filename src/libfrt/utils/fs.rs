@@ -30,6 +30,17 @@ pub fn get_mtime<U: AsRef<Path>>(f: U) -> Result<u64> {
         .as_secs())
 }
 
+pub fn make_dir<U: AsRef<Path>>(p: U) -> Result<()> {
+    let p = p.as_ref();
+
+    if !p.exists() {
+        info!("Make directory: '{}'", p.display());
+        std::fs::create_dir_all(p)?;
+    }
+
+    Ok(())
+}
+
 pub fn ensure_dir<U: AsRef<Path>>(p: U) -> Result<()> {
     let p = p.as_ref();
     let p = p.parent().ok_or_else(|| {
@@ -39,10 +50,7 @@ pub fn ensure_dir<U: AsRef<Path>>(p: U) -> Result<()> {
         )
     })?;
 
-    if !p.exists() {
-        info!("Make directory: '{}'", p.display());
-        std::fs::create_dir(p)?;
-    }
+    make_dir(p)?;
 
     Ok(())
 }

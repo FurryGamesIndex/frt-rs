@@ -25,7 +25,9 @@ pub fn cli(profile: Profile, sub_args: &SubCommandBuild) -> Result<()> {
 
     backend_args.insert("output".to_owned(), sub_args.output.clone());
 
-    context.invoke_backend(backend_args)?;
+    context.resync_backend(&backend_args)?;
+
+    context.invoke_backend(&backend_args)?;
 
     Ok(())
 }
