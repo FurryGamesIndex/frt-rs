@@ -239,12 +239,11 @@ impl Backend for BackendWWW {
         data: &ContextData,
         args: &BackendArguments
     ) -> Result<BackendArguments> {
-        let mut ret = BackendArguments::new();
+        let mut ret = BackendArguments::default();
 
-        let output_dir = args.get("output")
+        let output_dir = args.get_string("output")
             .ok_or_else(|| Error::new(ErrorKind::InvalidArgument, 
-                "Missing argument 'output'"))?
-            .to_owned();
+                "Missing argument 'output'"))?;
 
         let output_dir = Path::new(&output_dir);
 
@@ -260,7 +259,7 @@ impl Backend for BackendWWW {
             lang: LangId::default(),
         };
 
-        let target = render_context.args.get("target").map_or("", String::as_str);
+        let target = render_context.args.get_string("target").unwrap_or(String::new());
 
         let mut output = PageRenderOutput::default();
 
@@ -268,7 +267,7 @@ impl Backend for BackendWWW {
             render_context.lang = lang.clone();
             info!("Render starting, lang: {}", render_context.lang.as_str());
 
-            output.extend(match target {
+            output.extend(match target.as_str() {
                 "" => {
                     let mut out = PageRenderOutput::default();
                     for page in self.pages.values() {
@@ -276,7 +275,7 @@ impl Backend for BackendWWW {
                     }
                     out
                 },
-                _ => match self.pages.get(target) {
+                _ => match self.pages.get(target.as_str()) {
                     Some(page) => page.render(&render_context)?,
                     None => return Err(Error::new(ErrorKind::InvalidArgument,
                         format!("Unsupported argument target '{}'", target).as_str()).into())

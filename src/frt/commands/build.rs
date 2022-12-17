@@ -21,9 +21,10 @@ pub fn cli(profile: Profile, sub_args: &SubCommandBuild) -> Result<()> {
     let mut context = Context::new(profile)?;
     context.full_init()?;
 
-    let mut backend_args = BackendArguments::new();
+    let mut backend_args = BackendArguments::default();
 
-    backend_args.insert("output".to_owned(), sub_args.output.clone());
+    backend_args.set_bool("fs_output".to_owned(), true);
+    backend_args.set_string("output".to_owned(), sub_args.output.clone());
 
     context.resync_backend(&backend_args)?;
 
