@@ -28,7 +28,7 @@ pub fn cli(profile: Profile, sub_args: &SubCommandBuild) -> Result<()> {
 
     context.resync_backend(&backend_args)?;
 
-    context.invoke_backend(&backend_args)?;
+    context.invoke_backend()?;
 
     Ok(())
 }

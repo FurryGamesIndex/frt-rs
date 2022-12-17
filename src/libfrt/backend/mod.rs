@@ -47,13 +47,6 @@ impl BackendArguments {
 }
 
 pub trait Backend {
-    fn render(
-        &self,
-        profile: &Profile,
-        data: &ContextData,
-        args: &BackendArguments
-    ) -> Result<BackendArguments>;
-
     fn resync(
         &mut self,
         _profile: &Profile,
@@ -62,4 +55,11 @@ pub trait Backend {
     ) -> Result<()> {
         Ok(())
     }
+
+    fn render(
+        &self,
+        profile: &Profile,
+        data: &ContextData
+    ) -> Result<BackendArguments>;
+
 }

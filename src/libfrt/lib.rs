@@ -190,11 +190,11 @@ impl Context {
         Ok(())
     }
 
-    pub fn invoke_backend(&self, args: &BackendArguments) -> Result<BackendArguments> {
+    pub fn invoke_backend(&self) -> Result<BackendArguments> {
         let result = self.backend
             .as_ref()
             .unwrap()
-            .render(&self.profile, &self.data, args)?;
+            .render(&self.profile, &self.data)?;
         info!("Render done");
         Ok(result)
     }

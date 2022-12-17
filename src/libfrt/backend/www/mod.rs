@@ -5,7 +5,7 @@ mod stylesheet;
 mod terafn;
 
 use std::collections::HashMap;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 
@@ -25,8 +25,9 @@ use crate::utils::fs::{copy_dir, ensure_dir};
 struct RenderContext<'a> {
     games: &'a HashMap<String, GameWWW>,
 
+    backend: &'a BackendWWW,
+
     data: &'a ContextData,
-    args: &'a BackendArguments,
     tera: &'a tera::Tera,
     lang: LangId,
 }
@@ -46,9 +47,17 @@ impl RenderContext<'_> {
     }
 }
 
+enum OutputMode {
+    NoOutput,
+    Filesystem(PathBuf),
+}
+
 pub struct BackendWWW {
     pub profile: ProfileWWW,
     pub tera: tera::Tera,
+
+    output: OutputMode,
+    target: String,
 
     stylesheets: Stylesheets,
     pages: HashMap<String, Box<dyn Page>>,
@@ -65,6 +74,9 @@ impl BackendWWW {
                 None => ProfileWWW::default(),
             },
             tera: tera::Tera::default(),
+
+            output: OutputMode::NoOutput,
+            target: String::new(),
 
             stylesheets: Stylesheets::default(),
             pages: HashMap::new(),
@@ -115,6 +127,16 @@ impl Backend for BackendWWW {
     ) -> Result<()> {
         info!("Re-syncing backend data");
 
+        if args.get_bool("fs_output") {
+            let output_dir = args.get_string("output")
+            .ok_or_else(|| Error::new(ErrorKind::InvalidArgument, 
+                "Missing argument 'output'"))?;
+
+            self.output = OutputMode::Filesystem(Path::new(&output_dir).into());
+        }
+
+        self.target = args.get_string("target").unwrap_or(String::new());
+
         self.langs = data.ui.keys().map(|i| i.to_owned()).collect();
         if !data.ui.contains_key(&LangId::default()) {
             self.langs.push(LangId::default());
@@ -134,30 +156,23 @@ impl Backend for BackendWWW {
     fn render(
         &self,
         profile: &Profile,
-        data: &ContextData,
-        args: &BackendArguments
+        data: &ContextData
     ) -> Result<BackendArguments> {
         let mut ret = BackendArguments::default();
 
-        let output_dir = args.get_string("output")
-            .ok_or_else(|| Error::new(ErrorKind::InvalidArgument, 
-                "Missing argument 'output'"))?;
-
-        let output_dir = Path::new(&output_dir);
-
-        if std::fs::metadata(&output_dir).is_ok() {
-            std::fs::remove_dir_all(&output_dir)?;
+        if let OutputMode::Filesystem(output_dir) = &self.output {
+            if std::fs::metadata(&output_dir).is_ok() {
+                std::fs::remove_dir_all(&output_dir)?;
+            }
         }
 
         let mut render_context = RenderContext {
             games: &self.games,
+            backend: &self,
             data: data,
-            args: args,
             tera: &self.tera,
             lang: LangId::default(),
         };
-
-        let target = render_context.args.get_string("target").unwrap_or(String::new());
 
         let mut output = PageRenderOutput::default();
 
@@ -165,7 +180,7 @@ impl Backend for BackendWWW {
             render_context.lang = lang.clone();
             info!("Render starting, lang: {}", render_context.lang.as_str());
 
-            output.extend(match target.as_str() {
+            output.extend(match self.target.as_str() {
                 "" => {
                     let mut out = PageRenderOutput::default();
                     for page in self.pages.values() {
@@ -173,51 +188,54 @@ impl Backend for BackendWWW {
                     }
                     out
                 },
-                _ => match self.pages.get(target.as_str()) {
+                _ => match self.pages.get(self.target.as_str()) {
                     Some(page) => page.render(&render_context)?,
                     None => return Err(Error::new(ErrorKind::InvalidArgument,
-                        format!("Unsupported argument target '{}'", target).as_str()).into())
+                        format!("Unsupported argument target '{}'", self.target).as_str()).into())
                 }
             });
         }
 
-        for src in self.profile.path_static_layers.iter() {
-            info!("Copy static layer '{}'", src);
-            copy_dir(src, output_dir)?;
-        }
-
-        for src in self.profile.path_icon.iter() {
-            info!("Copy icon layer '{}'", src);
-            let output_dir = output_dir.join("icons");
-            copy_dir(src, output_dir)?;
-        }
-
-        for (fnm, f) in self.stylesheets.sheets.iter() {
-            info!("Write stylesheet '{}'", fnm);
-
-            let p = output_dir.join(fnm);
-            ensure_dir(&p)?;
-
-            std::fs::write(p, &f.contents)?;
-        }
-
-        info!("Write generated files");
-        for (fnm, file) in output.pages.iter() {
-            match file {
-                pages::File::Regular(contents) => {
-                    let f = output_dir.join(fnm);
-                    ensure_dir(&f)?;
-
-                    std::fs::write(f, contents)?;
-                },
-                pages::File::Symlink(original) => {
-                    #[cfg(unix)]
-                    std::os::unix::fs::symlink(original, output_dir.join(fnm))?;
-                    #[cfg(windows)]
-                    error!("Symlink not currently supported on Windows platform. Ignored.");
-                },
+        if let OutputMode::Filesystem(output_dir) = &self.output {
+            for src in self.profile.path_static_layers.iter() {
+                info!("Copy static layer '{}'", src);
+                copy_dir(src, output_dir)?;
             }
-            
+    
+            for src in self.profile.path_icon.iter() {
+                info!("Copy icon layer '{}'", src);
+                let output_dir = output_dir.join("icons");
+                copy_dir(src, output_dir)?;
+            }
+    
+            for (fnm, f) in self.stylesheets.sheets.iter() {
+                info!("Write stylesheet '{}'", fnm);
+    
+                let p = output_dir.join(fnm);
+                ensure_dir(&p)?;
+    
+                std::fs::write(p, &f.contents)?;
+            }
+    
+            info!("Write generated files");
+            for (fnm, file) in output.pages.iter() {
+                match file {
+                    pages::File::Regular(contents) => {
+                        let f = output_dir.join(fnm);
+                        ensure_dir(&f)?;
+    
+                        std::fs::write(f, contents)?;
+                    },
+                    pages::File::Symlink(original) => {
+                        #[cfg(unix)]
+                        std::os::unix::fs::symlink(original, output_dir.join(fnm))?;
+                        #[cfg(windows)]
+                        error!("Symlink not currently supported on Windows platform. Ignored.");
+                    },
+                }
+            }
+        } else {
+            todo!("Copy rendered pages into ret for NoOutput mode");
         }
 
         Ok(ret)
