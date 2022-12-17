@@ -1,21 +1,19 @@
-use serde::Serialize;
-
 use super::raw::RawScreenshotItem;
 
-#[derive(Serialize, Debug)]
+#[derive(Debug)]
 pub enum ImageSource {
     LocalShared(String),
     Bundled(String),
     Remote(String),
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Debug)]
 pub struct VideoSource {
     pub mime: String,
     pub uri: String,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Debug)]
 pub struct Image {
     source: ImageSource,
     captain: String,
@@ -29,7 +27,7 @@ pub struct Image {
     mtime: Option<i64>,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Debug)]
 pub enum Media {
     Image(Image),
     Youtube(String),
