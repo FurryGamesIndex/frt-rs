@@ -33,7 +33,10 @@ impl BackendArguments {
         })
     }
 
-    pub fn get_bool(&self, k: impl AsRef<str>) -> bool {
+    pub fn get_bool<K>(&self, k: K) -> bool
+    where
+        K: AsRef<str>
+    {
         self.0.get(k.as_ref()).map(|v| {
             match v {
                 serde_json::Value::Bool(b) => *b,
