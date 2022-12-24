@@ -21,7 +21,7 @@ impl PageList {
         let mut tera_context = rcontext.make_common_tera_context()?;
         tera_context.insert("rr", "..");
 
-        let mut games: Vec<_> = rcontext.games.values().collect();
+        let mut games: Vec<_> = rcontext.backend.games.values().collect();
         games.sort_unstable_by(compare);
 
         let games: Vec<_> = games.into_iter().map(|g| {

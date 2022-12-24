@@ -23,8 +23,6 @@ use crate::i18n::LangId;
 use crate::utils::fs::{copy_dir, ensure_dir};
 
 struct RenderContext<'a> {
-    games: &'a HashMap<String, GameWWW>,
-
     backend: &'a BackendWWW,
 
     data: &'a ContextData,
@@ -61,9 +59,9 @@ pub struct BackendWWW {
 
     stylesheets: Stylesheets,
     pages: HashMap<String, Box<dyn Page>>,
+    langs: Vec<LangId>,
 
     games: HashMap<String, GameWWW>,
-    langs: Vec<LangId>,
 }
 
 impl BackendWWW {
@@ -146,6 +144,7 @@ impl Backend for BackendWWW {
             if game.dirty {
                 self.games.insert(game.id.clone(), GameWWW::from_game(game, &self.langs)?);
 
+
                 game.dirty = false;
             }
         }
@@ -167,7 +166,6 @@ impl Backend for BackendWWW {
         }
 
         let mut render_context = RenderContext {
-            games: &self.games,
             backend: &self,
             data: data,
             tera: &self.tera,
