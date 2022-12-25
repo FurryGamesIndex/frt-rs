@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use anyhow::Result;
 
+use crate::i18n::LangId;
 use super::Page;
 use super::PageRenderOutput;
 use super::RenderContext;
@@ -56,7 +57,10 @@ impl Page for PageMisc {
         let mut ret = PageRenderOutput::default();
 
         for (name, cfg) in self.pages.iter() {
-            ret.extend(Self::render_page(rcontext, name, cfg.0, cfg.1, cfg.2, cfg.3)?);
+            let i18n_support = cfg.3;
+            if i18n_support || rcontext.lang == LangId::default() {
+                ret.extend(Self::render_page(rcontext, name, cfg.0, cfg.1, cfg.2, i18n_support)?);
+            }
         }
 
         Ok(ret)
