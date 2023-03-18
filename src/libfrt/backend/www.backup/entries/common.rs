@@ -14,7 +14,7 @@ pub struct HtmlText {
 impl<> From<String> for HtmlText {
     fn from(s: String) -> Self {
         Self {
-            html: crate::utils::xml::escape_str(s.as_str()).replace("\n", "<br />"),
+            html: tera::escape_html(s.as_str()).replace("\n", "<br />"),
             plain: s
         }
     }

@@ -15,16 +15,16 @@ pub struct VideoSource {
 
 #[derive(Debug)]
 pub struct Image {
-    source: ImageSource,
-    captain: String,
+    pub source: ImageSource,
+    pub captain: String,
 
     /// Size of the image, width and height.
     /// Maybe unavailable for remote images.
-    size: Option<(u32, u32)>,
+    pub size: Option<(u32, u32)>,
 
     /// Timestamp for last modified of this image.
     /// Maybe unavailable for remote images.
-    mtime: Option<i64>,
+    pub mtime: Option<i64>,
 }
 
 #[derive(Debug)]

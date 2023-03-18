@@ -35,7 +35,7 @@ pub struct Game {
     pub l10n: HashMap<LangId, GameL10n>,
 
     pub bundle_path: PathBuf,
-    pub dirty: bool,
+    //pub dirty: bool,
 }
 
 #[derive(Debug)]
@@ -82,7 +82,7 @@ impl Game {
             l10n: HashMap::new(),
 
             bundle_path: bundle_path,
-            dirty: true,
+            //dirty: true,
         })
     }
 

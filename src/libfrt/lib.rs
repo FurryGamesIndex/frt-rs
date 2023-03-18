@@ -24,7 +24,7 @@ use error::{Error, ErrorKind};
 #[derive(Default)]
 pub struct ContextData {
     pub authors: HashMap<String, Author>,
-    pub games: HashMap<String, Game>,
+    pub games: HashMap<String, Rc<Game>>,
 
     pub link_rules: LinkRuleManager,
 
@@ -34,7 +34,7 @@ pub struct ContextData {
 impl ContextData {
     pub fn load_game(&mut self, path: &Path) -> Result<()> {
         let game = Game::from_bundle(self, path)?;
-        self.games.insert(game.id.to_owned(), game);
+        self.games.insert(game.id.to_owned(), Rc::new(game));
         Ok(())
     }
 
