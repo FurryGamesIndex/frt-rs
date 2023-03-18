@@ -16,7 +16,7 @@ use anyhow::Result;
 use entries::raw::RawStockConfig;
 use entries::{game::Game, author::Author};
 use entries::link::LinkRuleManager;
-use backend::{Backend, BackendArguments, www::BackendWWW};
+use backend::{Backend, BackendArguments};
 use i18n::LangId;
 use profile::Profile;
 use error::{Error, ErrorKind};
@@ -111,9 +111,9 @@ impl Context {
         Ok(Self {
             profile: profile,
 
-            // Currently we are only supporting the `www` backend.
-            // So, we hard-code the backend here.
-            backend: Some(Box::new(BackendWWW::new(backend_profile_value)?)),
+            // TODO: use backend-www
+            //backend: Some(Box::new(BackendWWW::new(backend_profile_value)?)),
+            backend: None,
 
             data: ContextData::default(),
         })

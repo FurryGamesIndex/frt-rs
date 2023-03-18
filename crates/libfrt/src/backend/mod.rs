@@ -1,5 +1,3 @@
-pub mod www;
-
 use std::collections::HashMap;
 
 use anyhow::Result;

@@ -1,0 +1,19 @@
+[package]
+name = "frt"
+version = "0.1.0"
+edition = "2021"
+
+description = "2nd Gen FGI Rendering Tool - command-line interface"
+readme = "../../README.md"
+homepage = "https://about.furrygames.top/frt"
+repository = "https://github.com/FurryGamesIndex/frt-rs.git"
+license = "AGPL-3.0-or-later"
+authors = ["UtopicPanther <upanther@furrygames.top>"]
+
+[dependencies]
+anyhow = { workspace = true }
+log = { workspace = true }
+pretty_env_logger = { workspace = true }
+clap = { workspace = true }
+
+libfrt = { path = "../libfrt" }
