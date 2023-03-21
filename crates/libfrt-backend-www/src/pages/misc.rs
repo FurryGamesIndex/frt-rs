@@ -2,41 +2,67 @@ use std::collections::HashMap;
 
 use anyhow::Result;
 
-use crate::i18n::LangId;
 use super::Page;
 use super::PageRenderOutput;
 use super::RenderContext;
+use super::TemplateCommonVariables;
+use askama::Template;
+use libfrt::i18n::LangId;
 
-pub struct PageMisc {
-    pages: HashMap<&'static str, (&'static str, &'static str, &'static str, bool)>,
+#[derive(Template)]
+#[template(path = "index.html")]
+pub struct IndexTemplate<'a> {
+    rr: &'static str,
+    rc: &'a RenderContext<'a>,
+    g: TemplateCommonVariables,
 }
+
+impl<'a> IndexTemplate<'a> {
+    fn new(rc: &'a RenderContext) -> IndexTemplate<'a> {
+        Self {
+            rr: "..",
+            rc,
+            g: TemplateCommonVariables::default(),
+        }
+    }
+}
+
+#[derive(Template)]
+#[template(path = "404.html")]
+pub struct C404Template<'a> {
+    rr: &'static str,
+    rc: &'a RenderContext<'a>,
+    g: TemplateCommonVariables,
+}
+
+impl<'a> C404Template<'a> {
+    fn new(rc: &'a RenderContext) -> C404Template<'a> {
+        Self {
+            rr: "/",
+            rc,
+            g: TemplateCommonVariables::default(),
+        }
+    }
+}
+
+pub struct PageMisc {}
 
 impl PageMisc {
     pub fn new() -> Self {
-        Self {
-            pages: HashMap::from([
-                ("index",     ("index.html",     "..", "/index.html",    true)),
-                ("languages", ("languages.html", ".",  "languages.html", false)),
-                ("404",       ("404.html",       ".",  "404.html",       false)),
-            ]),
-        }
+        Self {}
     }
 
     fn render_page(
         rcontext: &RenderContext,
-        name: &str,
-        template_name: &str,
-        rr: &str,
+        template: impl Template,
         output_fn: &str,
         i18n_support: bool,
     ) -> Result<PageRenderOutput> {
-        info!("Rendering: {}", name);
+        if !i18n_support && rcontext.lang != LangId::default() {
+            return Ok(PageRenderOutput::default());
+        }
 
-        let mut tera_context = rcontext.make_common_tera_context()?;
-        tera_context.insert("rr", rr);
-        tera_context.insert("g_active_page", format!("misc:{}", name).as_str());
-
-        let s = rcontext.tera.render(template_name, &tera_context)?;
+        let s = template.render()?;
 
         if i18n_support {
             Ok(PageRenderOutput::single_page(
@@ -44,24 +70,23 @@ impl PageMisc {
                 s,
             ))
         } else {
-            Ok(PageRenderOutput::single_page(
-                format!("{}", output_fn),
-                s,
-            ))
+            Ok(PageRenderOutput::single_page(format!("{}", output_fn), s))
         }
     }
 }
 
 impl Page for PageMisc {
-    fn render(&self, rcontext: &RenderContext) -> Result<PageRenderOutput> {
+    fn render(&self, rc: &RenderContext) -> Result<PageRenderOutput> {
         let mut ret = PageRenderOutput::default();
 
-        for (name, cfg) in self.pages.iter() {
-            let i18n_support = cfg.3;
-            if i18n_support || rcontext.lang == LangId::default() {
-                ret.extend(Self::render_page(rcontext, name, cfg.0, cfg.1, cfg.2, i18n_support)?);
-            }
-        }
+        ret.extend(Self::render_page(
+            rc,
+            IndexTemplate::new(rc),
+            "/index.html",
+            true,
+        )?);
+        //ret.extend(Self::render_page(rc, LanguagesTemplate::new(rc), "languages.html", false)?);
+        ret.extend(Self::render_page(rc, C404Template::new(rc), "404.html", false)?);
 
         Ok(ret)
     }

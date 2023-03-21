@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="{{ rc.lang.as_bcp47() }}">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1, maximum-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+{% match g.meta %}
+{% when Some with (meta) %}
+	<title>{{ meta.title }} - {{ rc.ui("main.title") }}</title>
+	<meta name="keywords" content="{{ meta.keywords }}">
+	<meta property="og:title" content="{{ meta.title }} - {{ rc.ui("page_title") }}"/>
+	<meta property="og:description" content="{{ meta.description }}"/>
+	<meta property="og:type" content="article"/>
+	<meta property="og:image" content="{{ meta.image }}"/>
+{% when None %}
+	<title>{{ rc.ui("main.title") }}</title>
+	<meta name="keywords" content="{{ rc.ui("seo.base_keywords") }}">
+{% endmatch %}
+	<meta name="description" content="{{ rc.ui("main.description") }}">
+{% if g.noindex %}
+	<meta name="robots" content="noindex">
+{% endif %}
+	<link rel="stylesheet" href="{{ rc.res(rr, "styles","styles/peafowl.css")|safe }}">
+	<link rel="stylesheet" href="{{ rc.res(rr, "icons", "icon.css")|safe }}">
+{% match g.extra_styles %}
+{% when Some with (extra_styles) %}
+	<style>{{ extra_styles }}</style>
+{% when None %}
+{% endmatch %}
+</head>
+<body>
+{% match rc.ui_raw("infobar") %}
+{% when Some with (value) %}
+	<aside class="version-warning">
+		<div class="container">
+			{{ rc.icon("misc", "warn")|safe }}
+			<p class="small">
+				{{ value.as_str().unwrap_or("")|safe }}<br>
+			</p>
+		</div>
+	</aside>
+{% when None %}
+{% endmatch %}

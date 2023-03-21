@@ -1,0 +1,38 @@
+{% extends "peafowl-private/base.html" %}
+
+{% let v_actived_page = "misc:index" %}
+
+{% block content %}
+<main class="main_index">
+	<hgroup>	
+		<h1>{{ rc.ui("index.header1") }}</h1>
+		<h2>{{ rc.ui("index.header2") }}</h2>
+	</hgroup>
+	<section class="content">
+		<article>
+			{{ rc.ui("index.content")|safe }}
+		</article>
+		<nav>
+			<a class="iconline" href="{{ rr }}/{{ rc.lang }}/list.html">
+				{{ rc.icon("misc", "list")|safe }}<span>{{ rc.ui("links.games") }}</span>
+			</a>
+			<a class="iconline" href="{{ rr }}/{{ rc.lang }}/search.html">
+				{{ rc.icon("misc", "search")|safe }}<span>{{ rc.ui("links.search") }}</span>
+			</a>
+			<a class="iconline" href="https://github.com/FurryGamesIndex/games/tree/master/.github/CONTRIBUTING.{{ rc.lang }}.md">
+				{{ rc.icon("misc", "paw")|safe }}<span>{{ rc.ui("links.contribute") }}</span>
+			</a>
+			<a class="iconline" href="https://github.com/FurryGamesIndex/games/wiki/Contributors">
+				{{ rc.icon("misc", "paw")|safe }}<span>{{ rc.ui("links.contributors") }}</span>
+			</a>
+			<a class="iconline" href="https://github.com/FurryGamesIndex/games">
+				{{ rc.icon("site", "github")|safe }}<span>{{ rc.ui("links.github") }}</span>
+			</a>
+			<a class="iconline" href="https://t.me/FurryGamesIndex">
+				{{ rc.icon("site", "telegram")|safe }}<span>{{ rc.ui("links.tg") }}</span>
+			</a>
+		</nav>
+	</section>
+</main>
+<hr />
+{% endblock %}

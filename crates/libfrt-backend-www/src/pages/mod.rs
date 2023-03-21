@@ -1,5 +1,5 @@
 pub mod misc;
-pub mod list;
+//pub mod list;
 
 use std::collections::HashMap;
 
@@ -31,4 +31,19 @@ impl PageRenderOutput {
 
 pub(in super) trait Page {
     fn render(&self, rcontext: &RenderContext) -> Result<PageRenderOutput>;
+}
+
+#[derive(Default)]
+pub struct CVMeta {
+    pub title: String,
+    pub keywords: String, /* TODO */
+    pub description: String,
+    pub image: String, /* TODO */
+}
+
+#[derive(Default)]
+pub struct TemplateCommonVariables {
+    meta: Option<CVMeta>,
+    noindex: bool,
+    extra_styles: Option<String>,
 }

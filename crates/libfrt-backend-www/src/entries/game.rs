@@ -3,9 +3,9 @@ use std::{collections::HashMap, path::PathBuf, rc::Rc};
 use anyhow::Result;
 use serde::Serialize;
 
-use super::super::BackendWWW;
+use crate::BackendWWW;
 use super::common::HtmlText;
-use crate::{
+use libfrt::{
     entries::game::{Description, Game},
     i18n::LangId,
 };

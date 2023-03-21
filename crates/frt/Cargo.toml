@@ -17,3 +17,9 @@ pretty_env_logger = { workspace = true }
 clap = { workspace = true }
 
 libfrt = { path = "../libfrt" }
+
+libfrt-backend-www = { path = "../libfrt-backend-www", optional = true }
+
+[features]
+backend-www = ["dep:libfrt-backend-www"]
+default = ["backend-www"]

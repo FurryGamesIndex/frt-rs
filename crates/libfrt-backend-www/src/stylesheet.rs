@@ -4,8 +4,8 @@ use anyhow::Result;
 use serde::Deserialize;
 use regex::Regex;
 
-use crate::error::{Error, ErrorKind};
-use crate::utils::fs::get_mtime;
+use libfrt::error::{Error, ErrorKind};
+use libfrt::utils::fs::get_mtime;
 
 
 #[derive(Deserialize, Debug)]

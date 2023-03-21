@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "crates/libfrt",
+    "crates/libfrt-backend-www",
     "crates/frt",
 ]
 

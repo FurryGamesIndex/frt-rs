@@ -1,9 +1,9 @@
 use anyhow::Result;
 use serde::Serialize;
 
-use crate::entries::game::Game;
-use crate::backend::www::BackendWWW;
-use crate::entries::media::{Image, ImageSource};
+use crate::BackendWWW;
+use libfrt::entries::game::Game;
+use libfrt::entries::media::{Image, ImageSource};
 
 #[derive(Serialize, Debug)]
 pub struct HtmlText {
@@ -14,7 +14,7 @@ pub struct HtmlText {
 impl<> From<String> for HtmlText {
     fn from(s: String) -> Self {
         Self {
-            html: crate::utils::xml::escape_str(s.as_str()).replace("\n", "<br />"),
+            html: libfrt::utils::xml::escape_str(s.as_str()).replace("\n", "<br />"),
             plain: s
         }
     }

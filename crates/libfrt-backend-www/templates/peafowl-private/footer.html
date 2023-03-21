@@ -1,0 +1,31 @@
+<footer class="small">
+<section>
+	<p>{{ rc.ui("footer.copyright")|safe }}</p>
+	<p><a href="{{ rr }}/privacy-policy.html">{{ rc.ui("footer.privacy_policy") }}</a></p>
+	<p><a href="{{ rr }}/credits.html">{{ rc.ui("footer.oss") }}</a></p>
+</section>
+<section>
+	<p><a class="iconline" href="{{ rr }}/languages.html">{{ rc.icon("misc", "language")|safe }}<span>{{ rc.ui("nav.languages") }}</span></a></p>
+	<p><a class="iconline" href="{{ rr }}/{{ rc.lang }}/preferences.html">{{ rc.icon("misc", "settings")|safe }}<span>{{ rc.ui("footer.preferences") }}</span></a></p>
+	<p>
+		{{ rc.ui("footer.tip")|safe }}
+	</p>
+	<address>
+		{{ rc.ui("footer.contact_us") }}<br>
+		<a href="https://github.com/FurryGamesIndex/games" title="{{ rc.ui("links.github") }}">
+			{{ rc.icon("site", "github")|safe }}
+		</a>
+		<a href="mailto:webmaster@furrygames.top" title="webmaster@furrygames.top">
+			{{ rc.icon("misc", "email")|safe }}
+		</a>
+		<a href="https://t.me/FurryGamesIndex" title="{{ rc.ui("links.tg") }}">
+			{{ rc.icon("site", "telegram")|safe }}
+		</a>
+	</address>
+</section>
+<section>
+	<p><a class="iconline" href="{{ rr }}/{{ rc.lang }}/feed.xml">{{ rc.icon("misc", "rss")|safe }}<span>{{ rc.ui("footer.rss") }}</span></a></p>
+	<p>{{ rc.ui("footer.rss_desc") }}</p>
+</section>
+</footer>
+<script src="{{ rc.res(rr, "root", "scripts/base.js") }}"></script>

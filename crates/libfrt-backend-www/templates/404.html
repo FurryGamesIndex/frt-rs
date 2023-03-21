@@ -1,0 +1,12 @@
+{% extends "peafowl-private/base_nav.html" %}
+
+{% let v_actived_page = "misc:404" %}
+
+{% block content %}
+<main class="main_generic">
+	<h1>{{ rc.icon("misc", "heart-broken")|safe }} 404</h1>
+	<p>The requested URL was not found on this server.</p>
+	<p><a href="/">Navigate to homepage</a></p>
+</main>
+<hr />
+{% endblock %}

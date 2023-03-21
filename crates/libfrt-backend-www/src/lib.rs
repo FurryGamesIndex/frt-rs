@@ -2,6 +2,9 @@ mod profile;
 mod pages;
 mod entries;
 mod stylesheet;
+mod rc;
+
+#[macro_use] extern crate log;
 
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -11,21 +14,14 @@ use anyhow::Result;
 use profile::ProfileWWW;
 use stylesheet::Stylesheets;
 use pages::{Page, misc::PageMisc, PageRenderOutput};
-use self::entries::game::GameWWW;
-use self::pages::list::PageList;
-use super::{Backend, BackendArguments};
-use crate::error::{Error, ErrorKind};
-use crate::ContextData;
-use crate::profile::Profile;
-use crate::i18n::LangId;
-use crate::utils::fs::{copy_dir, ensure_dir, make_dir};
-
-struct RenderContext<'a> {
-    backend: &'a BackendWWW,
-
-    data: &'a ContextData,
-    lang: LangId,
-}
+use entries::game::GameWWW;
+use libfrt::backend::{Backend, BackendArguments};
+use libfrt::error::{Error, ErrorKind};
+use libfrt::ContextData;
+use libfrt::profile::Profile;
+use libfrt::i18n::LangId;
+use libfrt::utils::fs::{copy_dir, ensure_dir, make_dir};
+use crate::rc::RenderContext;
 
 enum OutputMode {
     NoOutput,
