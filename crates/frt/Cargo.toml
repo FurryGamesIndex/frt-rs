@@ -15,11 +15,13 @@ anyhow = { workspace = true }
 log = { workspace = true }
 pretty_env_logger = { workspace = true }
 clap = { workspace = true }
+toml = { workspace = true }
 
 libfrt = { path = "../libfrt" }
 
 libfrt-backend-www = { path = "../libfrt-backend-www", optional = true }
 
 [features]
-backend-www = ["dep:libfrt-backend-www"]
-default = ["backend-www"]
+backend-www = [ "dep:libfrt-backend-www" ]
+backend-null = []
+default = [ "backend-www", "backend-null" ]

@@ -1,8 +1,10 @@
 use anyhow::Result;
 
 use clap::Parser;
-use libfrt::{Context, profile::Profile};
 use libfrt::backend::BackendArguments;
+use libfrt::{profile::Profile, Context};
+
+use crate::CliBackend;
 
 #[derive(Parser, Debug)]
 pub struct SubCommandBuild {
@@ -14,11 +16,12 @@ pub struct SubCommandBuild {
     /// Same as use -a output=...
     #[clap(short = 'o', long, default_value = "output")]
     output: String,
-
 }
 
-pub fn cli(profile: Profile, sub_args: &SubCommandBuild) -> Result<()> {
-    let mut context = Context::new(profile)?;
+pub fn cli(mut profile: Profile, sub_args: &SubCommandBuild, backend: &CliBackend) -> Result<()> {
+    let backend = backend.new_backend(&mut profile)?;
+
+    let mut context = Context::new(profile, backend)?;
     context.full_init()?;
 
     let mut backend_args = BackendArguments::default();

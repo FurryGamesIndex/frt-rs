@@ -102,18 +102,15 @@ pub struct Context {
 }
 
 impl Context {
-    pub fn new(mut profile: Profile) -> Result<Self> {
-        let backend_profile_value = profile.backends.remove("www");
-        profile.backends.clear();
+    pub fn new(mut profile: Profile, backend: Option<Box<dyn Backend>>) -> Result<Self> {
+        info!("Context initializing");
 
-        info!("Backend initializing");
+        profile.backends.clear();
 
         Ok(Self {
             profile: profile,
 
-            // TODO: use backend-www
-            //backend: Some(Box::new(BackendWWW::new(backend_profile_value)?)),
-            backend: None,
+            backend: backend,
 
             data: ContextData::default(),
         })

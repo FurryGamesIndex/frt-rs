@@ -72,6 +72,9 @@ impl BackendWWW {
             //ifac.icons = serde_json::from_str(&json)?;
         }
 
+        backend.pages.insert("misc".to_string(), Box::new(PageMisc::new()));
+        //backend.pages.insert("list".to_string(), Box::new(PageList::new()));
+
         Ok(backend)
     }
 }

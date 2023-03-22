@@ -1,5 +1,7 @@
-#[macro_use] extern crate log;
+#[macro_use]
+extern crate log;
 
+pub mod backend;
 pub mod commands;
 
 use libfrt::profile::Profile;
@@ -7,14 +9,14 @@ use libfrt::profile::Profile;
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 
+use crate::backend::CliBackend;
+
 #[derive(Subcommand, Debug)]
 pub enum SubCommand {
     /// Render FGI website, pages, components, etc
     Build(commands::build::SubCommandBuild),
     /// Validate and check source(s)
-    Lint {
-        game_bundle: Option<String>
-    }
+    Lint { game_bundle: Option<String> },
 }
 
 #[derive(Parser, Debug)]
@@ -30,8 +32,12 @@ struct Cli {
     profile: Option<String>,
 
     /// Override profile configuration values (in TOML format)
-    #[clap( long)]
+    #[clap(long)]
     config: Option<String>,
+
+    /// Select backend
+    #[clap(short = 'b', long, default_value = "www")]
+    backend: CliBackend,
 
     #[clap(subcommand)]
     command: SubCommand,
@@ -77,8 +83,8 @@ fn main() -> Result<()> {
 
     match args.command {
         SubCommand::Build(s) => {
-            commands::build::cli(profile, &s)?;
-        },
+            commands::build::cli(profile, &s, &args.backend)?;
+        }
         SubCommand::Lint { .. } => todo!(),
     }
 
