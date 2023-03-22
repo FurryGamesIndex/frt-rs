@@ -1,27 +1,28 @@
-mod profile;
-mod pages;
 mod entries;
-mod stylesheet;
+mod pages;
+mod profile;
 mod rc;
+mod stylesheet;
 
-#[macro_use] extern crate log;
+#[macro_use]
+extern crate log;
 
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 
-use profile::ProfileWWW;
-use stylesheet::Stylesheets;
-use pages::{Page, misc::PageMisc, PageRenderOutput};
+use crate::rc::RenderContext;
 use entries::game::GameWWW;
 use libfrt::backend::{Backend, BackendArguments};
 use libfrt::error::{Error, ErrorKind};
-use libfrt::ContextData;
-use libfrt::profile::Profile;
 use libfrt::i18n::LangId;
+use libfrt::profile::Profile;
 use libfrt::utils::fs::{copy_dir, ensure_dir, make_dir};
-use crate::rc::RenderContext;
+use libfrt::ContextData;
+use pages::{misc::PageMisc, Page, PageRenderOutput};
+use profile::ProfileWWW;
+use stylesheet::Stylesheets;
 
 enum OutputMode {
     NoOutput,
@@ -36,6 +37,7 @@ pub struct BackendWWW {
 
     stylesheets: Stylesheets,
     pages: HashMap<String, Box<dyn Page>>,
+    icons: HashMap<String, u32>,
     langs: Vec<LangId>,
 
     games: HashMap<String, GameWWW>,
@@ -53,6 +55,7 @@ impl BackendWWW {
             target: String::new(),
 
             stylesheets: Stylesheets::default(),
+            icons: HashMap::new(),
             pages: HashMap::new(),
 
             games: HashMap::new(),
@@ -61,18 +64,21 @@ impl BackendWWW {
 
         for path in backend.profile.path_stylesheets.iter() {
             info!("Loading stylesheets from: {path}");
-            backend.stylesheets.extend(Stylesheets::from_path(Path::new(path))?);
+            backend
+                .stylesheets
+                .extend(Stylesheets::from_path(Path::new(path))?);
         }
 
         for path in backend.profile.path_icon.iter() {
             info!("Loading icons metadatas from: {path}");
-            let json = std::fs::read_to_string(
-                Path::new(path).join("FGI-icons.json"))?;
+            let json = std::fs::read_to_string(Path::new(path).join("FGI-icons.json"))?;
 
-            //ifac.icons = serde_json::from_str(&json)?;
+            backend.icons = serde_json::from_str(&json)?;
         }
 
-        backend.pages.insert("misc".to_string(), Box::new(PageMisc::new()));
+        backend
+            .pages
+            .insert("misc".to_string(), Box::new(PageMisc::new()));
         //backend.pages.insert("list".to_string(), Box::new(PageList::new()));
 
         Ok(backend)
@@ -84,14 +90,14 @@ impl Backend for BackendWWW {
         &mut self,
         profile: &Profile,
         data: &mut ContextData,
-        args: &BackendArguments
+        args: &BackendArguments,
     ) -> Result<()> {
         info!("Re-syncing backend data");
 
         if args.get_bool("fs_output") {
-            let output_dir = args.get_string("output")
-            .ok_or_else(|| Error::new(ErrorKind::InvalidArgument, 
-                "Missing argument 'output'"))?;
+            let output_dir = args
+                .get_string("output")
+                .ok_or_else(|| libfrt::err!(InvalidArgument, "Missing argument 'output'"))?;
 
             self.output = OutputMode::Filesystem(Path::new(&output_dir).into());
         }
@@ -113,11 +119,7 @@ impl Backend for BackendWWW {
         Ok(())
     }
 
-    fn render(
-        &self,
-        profile: &Profile,
-        data: &ContextData
-    ) -> Result<BackendArguments> {
+    fn render(&self, profile: &Profile, data: &ContextData) -> Result<BackendArguments> {
         let mut ret = BackendArguments::default();
 
         if let OutputMode::Filesystem(output_dir) = &self.output {
@@ -145,12 +147,17 @@ impl Backend for BackendWWW {
                         out.extend(page.render(&render_context)?);
                     }
                     out
-                },
+                }
                 _ => match self.pages.get(self.target.as_str()) {
                     Some(page) => page.render(&render_context)?,
-                    None => return Err(Error::new(ErrorKind::InvalidArgument,
-                        format!("Unsupported argument target '{}'", self.target).as_str()).into())
-                }
+                    None => {
+                        libfrt::bail!(
+                            InvalidArgument,
+                            "Unsupported argument target '{}'",
+                            self.target
+                        )
+                    }
+                },
             });
         }
 
@@ -159,37 +166,37 @@ impl Backend for BackendWWW {
                 info!("Copy static layer '{}'", src);
                 copy_dir(src, output_dir)?;
             }
-    
+
             for src in self.profile.path_icon.iter() {
                 info!("Copy icon layer '{}'", src);
                 let output_dir = output_dir.join("icons");
                 copy_dir(src, output_dir)?;
             }
-    
+
             for (fnm, f) in self.stylesheets.sheets.iter() {
                 info!("Write stylesheet '{}'", fnm);
-    
+
                 let p = output_dir.join(fnm);
                 ensure_dir(&p)?;
-    
+
                 std::fs::write(p, &f.contents)?;
             }
-    
+
             info!("Write generated files");
             for (fnm, file) in output.pages.iter() {
                 match file {
                     pages::File::Regular(contents) => {
                         let f = output_dir.join(fnm);
                         ensure_dir(&f)?;
-    
+
                         std::fs::write(f, contents)?;
-                    },
+                    }
                     pages::File::Symlink(original) => {
                         #[cfg(unix)]
                         std::os::unix::fs::symlink(original, output_dir.join(fnm))?;
                         #[cfg(windows)]
                         error!("Symlink not currently supported on Windows platform. Ignored.");
-                    },
+                    }
                 }
             }
         } else {
