@@ -1,25 +1,26 @@
-pub mod entries;
-pub mod profile;
 pub mod backend;
-pub mod i18n;
-pub mod utils;
+pub mod entries;
 pub mod error;
+pub mod i18n;
+pub mod profile;
+pub mod utils;
 
-#[macro_use] extern crate log;
+#[macro_use]
+extern crate log;
 
+use anyhow::Result;
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 use std::rc::Rc;
-use anyhow::Result;
 
-use entries::raw::RawStockConfig;
-use entries::{game::Game, author::Author};
-use entries::link::LinkRuleManager;
 use backend::{Backend, BackendArguments};
+use entries::link::LinkRuleManager;
+use entries::raw::RawStockConfig;
+use entries::{author::Author, game::Game};
+use error::{Error, ErrorKind};
 use i18n::LangId;
 use profile::Profile;
-use error::{Error, ErrorKind};
 
 #[derive(Default)]
 pub struct ContextData {
@@ -60,8 +61,13 @@ impl ContextData {
 
     pub fn load_ui(&mut self, file: &Path) -> Result<()> {
         let content = std::fs::read_to_string(file)?;
-        self.ui.entry(LangId::default()).or_insert(toml::from_str("")?);
-        utils::toml::merge(self.ui.get_mut(&LangId::default()).unwrap(), toml::from_str(content.as_str())?);
+        self.ui
+            .entry(LangId::default())
+            .or_insert(toml::from_str("")?);
+        utils::toml::merge(
+            self.ui.get_mut(&LangId::default()).unwrap(),
+            toml::from_str(content.as_str())?,
+        );
         Ok(())
     }
 
@@ -70,9 +76,9 @@ impl ContextData {
 
         match &mut orig_ui {
             toml::Value::Table(table) => {
-                let low_ui = table.remove("_").ok_or_else(||
-                    Error::new(ErrorKind::InvalidArgument, 
-                        "The '_' entry was not found in ui config"))?;
+                let low_ui = table.remove("_").ok_or_else(|| {
+                    crate::err!(InvalidArgument, "The '_' entry was not found in ui config")
+                })?;
 
                 for (lang, value) in table.iter() {
                     let mut v = low_ui.clone();
@@ -84,9 +90,8 @@ impl ContextData {
                 }
 
                 self.ui.entry(LangId::default()).or_insert(low_ui);
-            },
-            _ => return Err(Error::new(ErrorKind::InvalidArgument, 
-                "Invalid ui config format").into()),
+            }
+            _ => crate::bail!(InvalidArgument, "Invalid ui config format"),
         }
 
         Ok(())
@@ -188,7 +193,8 @@ impl Context {
     }
 
     pub fn invoke_backend(&self) -> Result<BackendArguments> {
-        let result = self.backend
+        let result = self
+            .backend
             .as_ref()
             .unwrap()
             .render(&self.profile, &self.data)?;

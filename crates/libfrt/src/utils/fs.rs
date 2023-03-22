@@ -43,12 +43,9 @@ pub fn make_dir<U: AsRef<Path>>(p: U) -> Result<()> {
 
 pub fn ensure_dir<U: AsRef<Path>>(p: U) -> Result<()> {
     let p = p.as_ref();
-    let p = p.parent().ok_or_else(|| {
-        Error::new(
-            ErrorKind::NotExist,
-            format!("File not exist: {}", p.display()).as_str(),
-        )
-    })?;
+    let p = p
+        .parent()
+        .ok_or_else(|| crate::err!(NotExist, "File not exist: {}", p.display()))?;
 
     make_dir(p)?;
 

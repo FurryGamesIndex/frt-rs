@@ -5,13 +5,12 @@ use std::fmt::Display;
 #[derive(Debug)]
 pub struct Error {
     kind: ErrorKind,
-    message: String
+    message: String,
 }
 
 /// Errors that can occur in FRT.
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum ErrorKind {
-
     /// Bundle invalid, missing required files. etc
     InvalidBundle,
 
@@ -44,7 +43,45 @@ impl Error {
     pub fn new(kind: ErrorKind, message: &str) -> Self {
         Self {
             kind: kind,
-            message: message.to_owned()
+            message: message.to_owned(),
         }
     }
+}
+
+#[macro_export]
+macro_rules! err {
+    ($kind:ident, $msg:literal) => {
+        $crate::error::Error::new(
+            $crate::error::ErrorKind::$kind,
+            $msg
+        )
+    };
+    ($kind:ident, $fmt:expr, $($arg:tt)*) => {
+        $crate::error::Error::new(
+            $crate::error::ErrorKind::$kind,
+            format!($fmt, $($arg)*).as_str()
+        )
+    };
+}
+
+#[macro_export]
+macro_rules! bail {
+    ($kind:ident, $msg:literal) => {
+        return core::result::Result::Err(
+            $crate::error::Error::new(
+                $crate::error::ErrorKind::$kind,
+                $msg
+            )
+            .into()
+        )
+    };
+    ($kind:ident, $fmt:expr, $($arg:tt)*) => {
+        return core::result::Result::Err(
+            $crate::error::Error::new(
+                $crate::error::ErrorKind::$kind,
+                format!($fmt, $($arg)*).as_str()
+            )
+            .into()
+        )
+    };
 }

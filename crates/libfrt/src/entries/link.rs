@@ -1,14 +1,14 @@
 use std::collections::HashMap;
 use std::rc::Rc;
 
+use crate::utils::tengine;
 use anyhow::Result;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use crate::utils::tengine;
 
 use super::raw::RawLinkItem;
-use crate::i18n::LangId;
 use crate::error::{Error, ErrorKind};
+use crate::i18n::LangId;
 
 #[derive(Serialize, Debug)]
 pub struct Link {
@@ -29,7 +29,7 @@ pub struct StockLinkRule {
     pub regex: Option<Regex>,
     pub www_href: String,
     pub inference: bool,
-    pub passthrough: bool
+    pub passthrough: bool,
 }
 
 impl StockLinkRule {
@@ -54,9 +54,14 @@ impl StockLinkRule {
             let mut variables = HashMap::new();
 
             if let Some(re) = &self.regex {
-                let caps = re.captures(uri)
-                    .ok_or_else(|| Error::new(ErrorKind::InvalidArgument,
-                        format!("Failed to parse URI '{}' by rule '{}': regex not match", uri, self.name).as_str()))?;
+                let caps = re.captures(uri).ok_or_else(|| {
+                    crate::err!(
+                        InvalidArgument,
+                        "Failed to parse URI '{}' by rule '{}': regex not match",
+                        uri,
+                        self.name
+                    )
+                })?;
 
                 let mut i = 0;
                 for group in caps.iter() {
@@ -102,10 +107,16 @@ impl LinkRuleManager {
         self.rules.insert(rule.name.to_owned(), rule.clone());
 
         if !rule.passthrough && rule.inference {
-            let regex = rule.regex.as_ref().ok_or_else(|| Error::new(
-                ErrorKind::InvalidArgument,
-                "StockLink: regex is required for inference rule"))?
-            .clone();
+            let regex = rule
+                .regex
+                .as_ref()
+                .ok_or_else(|| {
+                    crate::err!(
+                        InvalidArgument,
+                        "StockLink: regex is required for inference rule",
+                    )
+                })?
+                .clone();
             self.inference_rules.push(rule.clone());
         }
 
@@ -115,52 +126,58 @@ impl LinkRuleManager {
     pub fn build_link(&self, raw_link: RawLinkItem) -> Result<Link> {
         Ok(match raw_link {
             RawLinkItem::Custom { name, uri } => {
-                if name.starts_with('.') { // stock link hint
+                if name.starts_with('.') {
+                    // stock link hint
                     let rule_name = &name[1..];
 
                     match self.rules.get(rule_name) {
                         Some(rule) => {
                             if !rule.match_uri(uri.as_str()) {
-                                return Err(Error::new(ErrorKind::InvalidArgument, 
-                                    format!("URI '{uri}' not matchs rule '{rule_name}'").as_str()).into())
+                                crate::bail!(
+                                    InvalidArgument,
+                                    "URI '{}' not matchs rule '{}'",
+                                    uri,
+                                    rule_name
+                                )
                             }
 
                             rule.build_link(uri.as_str())?
-                        },
+                        }
                         None => {
                             error!("impl LinkRuleManager: fn build_link(): STUB!"); /* TODO */
                             error!("Required stock link rule: {}", rule_name);
                             Link {
-                                label: HashMap::from([
-                                    (LangId::default(), "Unimplemented stock link".into())
-                                ]),
+                                label: HashMap::from([(
+                                    LangId::default(),
+                                    "Unimplemented stock link".into(),
+                                )]),
                                 uri: uri.to_owned(),
                                 rule: None,
                                 variables: HashMap::new(),
                             }
-                        },
+                        }
                     }
 
                     /* TODO: Revert to below codes after old data migration/transition
                     let rule = self.rules.get(rule_name)
-                        .ok_or_else(|| Error::new(ErrorKind::NotExist, 
+                        .ok_or_else(|| Error::new(ErrorKind::NotExist,
                             format!("Link rule '{rule_name}' not found").as_str()))?;
 
                     if !rule.match_uri(uri.as_str()) {
-                        return Err(Error::new(ErrorKind::InvalidArgument, 
+                        return Err(Error::new(ErrorKind::InvalidArgument,
                             format!("URI '{uri}' not matchs rule '{rule_name}'").as_str()).into())
                     }
 
                     rule.build_link(uri.as_str())?*/
                 } else {
                     Link {
-                        label: HashMap::from([( LangId::default(), name )]),
+                        label: HashMap::from([(LangId::default(), name)]),
                         uri,
                         rule: None,
                         variables: HashMap::new(),
                     }
                 }
-            },
+            }
             RawLinkItem::Auto(uri) => {
                 let mut matched_rule = None;
 
@@ -173,10 +190,9 @@ impl LinkRuleManager {
 
                 match matched_rule {
                     Some(rule) => rule.build_link(uri.as_str())?,
-                    None => return Err(Error::new(ErrorKind::NotExist, 
-                        format!("Inference failed. No rule matchs '{uri}'.").as_str()).into()),
+                    None => crate::bail!(NotExist, "Inference failed. No rule matchs '{}'.", uri),
                 }
-            },
+            }
         })
     }
 }
