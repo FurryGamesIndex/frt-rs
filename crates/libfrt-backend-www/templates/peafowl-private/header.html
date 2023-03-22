@@ -20,8 +20,8 @@
 {% if g.noindex %}
 	<meta name="robots" content="noindex">
 {% endif %}
-	<link rel="stylesheet" href="{{ rc.res(rr, "styles","styles/peafowl.css")|safe }}">
-	<link rel="stylesheet" href="{{ rc.res(rr, "icons", "icon.css")|safe }}">
+	<link rel="stylesheet" href="{{ rc.res(rr, "styles","styles/peafowl.css")? }}">
+	<link rel="stylesheet" href="{{ rc.res(rr, "icons", "icon.css")? }}">
 {% match g.extra_styles %}
 {% when Some with (extra_styles) %}
 	<style>{{ extra_styles }}</style>
@@ -33,7 +33,7 @@
 {% when Some with (value) %}
 	<aside class="version-warning">
 		<div class="container">
-			{{ rc.icon("misc", "warn")|safe }}
+			{{ rc.icon("misc", "warn")?|safe }}
 			<p class="small">
 				{{ value.as_str().unwrap_or("")|safe }}<br>
 			</p>

@@ -14,22 +14,22 @@
 		</article>
 		<nav>
 			<a class="iconline" href="{{ rr }}/{{ rc.lang }}/list.html">
-				{{ rc.icon("misc", "list")|safe }}<span>{{ rc.ui("links.games") }}</span>
+				{{ rc.icon("misc", "list")?|safe }}<span>{{ rc.ui("links.games") }}</span>
 			</a>
 			<a class="iconline" href="{{ rr }}/{{ rc.lang }}/search.html">
-				{{ rc.icon("misc", "search")|safe }}<span>{{ rc.ui("links.search") }}</span>
+				{{ rc.icon("misc", "search")?|safe }}<span>{{ rc.ui("links.search") }}</span>
 			</a>
 			<a class="iconline" href="https://github.com/FurryGamesIndex/games/tree/master/.github/CONTRIBUTING.{{ rc.lang }}.md">
-				{{ rc.icon("misc", "paw")|safe }}<span>{{ rc.ui("links.contribute") }}</span>
+				{{ rc.icon("misc", "paw")?|safe }}<span>{{ rc.ui("links.contribute") }}</span>
 			</a>
 			<a class="iconline" href="https://github.com/FurryGamesIndex/games/wiki/Contributors">
-				{{ rc.icon("misc", "paw")|safe }}<span>{{ rc.ui("links.contributors") }}</span>
+				{{ rc.icon("misc", "paw")?|safe }}<span>{{ rc.ui("links.contributors") }}</span>
 			</a>
 			<a class="iconline" href="https://github.com/FurryGamesIndex/games">
-				{{ rc.icon("site", "github")|safe }}<span>{{ rc.ui("links.github") }}</span>
+				{{ rc.icon("site", "github")?|safe }}<span>{{ rc.ui("links.github") }}</span>
 			</a>
 			<a class="iconline" href="https://t.me/FurryGamesIndex">
-				{{ rc.icon("site", "telegram")|safe }}<span>{{ rc.ui("links.tg") }}</span>
+				{{ rc.icon("site", "telegram")?|safe }}<span>{{ rc.ui("links.tg") }}</span>
 			</a>
 		</nav>
 	</section>

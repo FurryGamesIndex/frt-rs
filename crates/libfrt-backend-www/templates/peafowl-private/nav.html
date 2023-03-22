@@ -3,22 +3,22 @@
 	<div class="title">{{ rc.ui("main.title") }}</div>
 	<ul>
 		<li class="{% if v_actived_page == "misc:index" %}actived{% endif %}">
-			<a class="iconline" href="{{ rr }}/{{ rc.lang }}/index.html">{{ rc.icon("misc", "home")|safe }}{{ rc.ui("nav.index") }}</a>
+			<a class="iconline" href="{{ rr }}/{{ rc.lang }}/index.html">{{ rc.icon("misc", "home")?|safe }}{{ rc.ui("nav.index") }}</a>
 		</li>
 		<li class="{% if v_actived_page == "list:list" %}actived{% endif %}">
-			<a class="iconline" href="{{ rr }}/{{ rc.lang }}/list.html">{{ rc.icon("misc", "list")|safe }}{{ rc.ui("nav.list") }}</a>
+			<a class="iconline" href="{{ rr }}/{{ rc.lang }}/list.html">{{ rc.icon("misc", "list")?|safe }}{{ rc.ui("nav.list") }}</a>
 		</li>
 		<li class="{% if v_actived_page == "misc:search" %}actived{% endif %}">
-			<a class="iconline" href="{{ rr }}/{{ rc.lang }}/search.html">{{ rc.icon("misc", "search")|safe }}{{ rc.ui("nav.search") }}</a>
+			<a class="iconline" href="{{ rr }}/{{ rc.lang }}/search.html">{{ rc.icon("misc", "search")?|safe }}{{ rc.ui("nav.search") }}</a>
 		</li>
 		<li class="{% if v_actived_page == "misc:faq" %}actived{% endif %}">
-			<a class="iconline" href="{{ rr }}/{{ rc.lang }}/faq.html">{{ rc.icon("misc", "question")|safe }}{{ rc.ui("nav.faq") }}</a>
+			<a class="iconline" href="{{ rr }}/{{ rc.lang }}/faq.html">{{ rc.icon("misc", "question")?|safe }}{{ rc.ui("nav.faq") }}</a>
 		</li>
 		<li>
-			<a class="iconline" href="https://github.com/FurryGamesIndex/games/wiki/Contributors">{{ rc.icon("misc", "paw")|safe }}{{ rc.ui("nav.contributors") }}</a>
+			<a class="iconline" href="https://github.com/FurryGamesIndex/games/wiki/Contributors">{{ rc.icon("misc", "paw")?|safe }}{{ rc.ui("nav.contributors") }}</a>
 		</li>
 		<li class="{% if v_actived_page == "misc:languages" %}actived{% endif %}">
-			<a class="iconline" href="{{ rr }}/languages.html">{{ rc.icon("misc", "language")|safe }}{{ rc.ui("nav.languages") }}</a>
+			<a class="iconline" href="{{ rr }}/languages.html">{{ rc.icon("misc", "language")?|safe }}{{ rc.ui("nav.languages") }}</a>
 		</li>
 	</ul>
 </nav>
