@@ -47,3 +47,29 @@ pub struct TemplateCommonVariables {
     noindex: bool,
     extra_styles: Option<String>,
 }
+
+macro_rules! template {
+    ($file:literal, $name:ident $(, $custom_field:ty)?) => {
+        #[derive(Template)]
+        #[template(path = $file)]
+        pub(crate) struct $name<'a> {
+            rr: &'static str,
+            rc: &'a RenderContext<'a>,
+            g: $crate::pages::TemplateCommonVariables,
+            $(c: $custom_field,)?
+        }
+
+        impl<'a> $name<'a> {
+            fn new(rc: &'a RenderContext) -> $name<'a> {
+                Self {
+                    rr: "..",
+                    rc,
+                    g: $crate::pages::TemplateCommonVariables::default(),
+                    $(c: $custom_field::default(),)?
+                }
+            }
+        }
+    }
+}
+
+use template;

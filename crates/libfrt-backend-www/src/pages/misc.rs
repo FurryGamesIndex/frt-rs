@@ -1,49 +1,15 @@
-use std::collections::HashMap;
-
 use anyhow::Result;
 
 use super::Page;
 use super::PageRenderOutput;
 use super::RenderContext;
-use super::TemplateCommonVariables;
+use super::template;
 use askama::Template;
 use libfrt::i18n::LangId;
 
-#[derive(Template)]
-#[template(path = "index.html")]
-pub struct IndexTemplate<'a> {
-    rr: &'static str,
-    rc: &'a RenderContext<'a>,
-    g: TemplateCommonVariables,
-}
 
-impl<'a> IndexTemplate<'a> {
-    fn new(rc: &'a RenderContext) -> IndexTemplate<'a> {
-        Self {
-            rr: "..",
-            rc,
-            g: TemplateCommonVariables::default(),
-        }
-    }
-}
-
-#[derive(Template)]
-#[template(path = "404.html")]
-pub struct C404Template<'a> {
-    rr: &'static str,
-    rc: &'a RenderContext<'a>,
-    g: TemplateCommonVariables,
-}
-
-impl<'a> C404Template<'a> {
-    fn new(rc: &'a RenderContext) -> C404Template<'a> {
-        Self {
-            rr: "/",
-            rc,
-            g: TemplateCommonVariables::default(),
-        }
-    }
-}
+template!("index.html", IndexTemplate);
+template!("404.html", C404Template);
 
 pub struct PageMisc {}
 
