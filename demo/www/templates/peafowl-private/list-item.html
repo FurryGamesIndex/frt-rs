@@ -1,8 +1,0 @@
-<!-- TODO -->
-<section>
-    <h2 class="game_name"><a href="{{ rr }}/{{ lang }}/games/{{ game.id }}.html">{{ game.name.html|safe }}</a></h2>
-    <div class="description">
-            {{ game.brief_description.html|safe }}
-    </div>
-</section>
-{#{ game.thumbnail.with_rr(rr).html(node_class="thumbnail", alt=game_name) }#}

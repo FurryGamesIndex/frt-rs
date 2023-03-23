@@ -1,14 +1,14 @@
 use anyhow::Result;
 
+use super::template;
 use super::Page;
 use super::PageRenderOutput;
 use super::RenderContext;
-use super::template;
 use askama::Template;
 use libfrt::i18n::LangId;
 
-
 template!("index.html", IndexTemplate);
+template!("languages.html", LanguagesTemplate);
 template!("404.html", C404Template);
 
 pub struct PageMisc {}
@@ -51,8 +51,18 @@ impl Page for PageMisc {
             "/index.html",
             true,
         )?);
-        //ret.extend(Self::render_page(rc, LanguagesTemplate::new(rc), "languages.html", false)?);
-        ret.extend(Self::render_page(rc, C404Template::new(rc), "404.html", false)?);
+        ret.extend(Self::render_page(
+            rc,
+            LanguagesTemplate::new(rc),
+            "languages.html",
+            false,
+        )?);
+        ret.extend(Self::render_page(
+            rc,
+            C404Template::new(rc),
+            "404.html",
+            false,
+        )?);
 
         Ok(ret)
     }
