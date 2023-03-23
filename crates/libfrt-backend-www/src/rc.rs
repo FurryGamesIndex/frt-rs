@@ -13,12 +13,48 @@ pub struct RenderContext<'a> {
 }
 
 impl RenderContext<'_> {
-    pub fn ui(&self, k: impl AsRef<str>) -> &str {
-        todo!()
+    pub fn ui_raw(&self, k: impl AsRef<str>) -> Option<&toml::Value> {
+        let k = k.as_ref().split('.');
+        let mut v = self.data.ui.get(&self.lang);
+
+        for i in k.into_iter() {
+            match v {
+                Some(vv) => match vv {
+                    toml::Value::Table(t) => {
+                        v = t.get(i);
+                    }
+                    _ => {
+                        v = None;
+                        break;
+                    }
+                },
+                None => break,
+            }
+        }
+
+        v
     }
 
-    pub fn ui_raw(&self, k: impl AsRef<str>) -> Option<toml::Value> {
-        todo!()
+    pub fn ui(&self, k: impl AsRef<str>) -> &str {
+        match self.ui_raw(k.as_ref()) {
+            Some(v) => match v {
+                toml::Value::String(s) => s.as_str(),
+                _ => {
+                    warn!(
+                        "'{}' ui config is not a valid string type, fallback to empty string",
+                        k.as_ref()
+                    );
+                    ""
+                }
+            },
+            None => {
+                warn!(
+                    "'{}' was not found in ui config, fallback to empty string",
+                    k.as_ref()
+                );
+                ""
+            }
+        }
     }
 
     pub fn icon(&self, scope: impl AsRef<str>, name: impl AsRef<str>) -> Result<String> {

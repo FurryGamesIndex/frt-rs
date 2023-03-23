@@ -55,7 +55,7 @@ macro_rules! template {
         pub(crate) struct $name<'a> {
             rr: &'static str,
             rc: &'a RenderContext<'a>,
-            g: $crate::pages::TemplateCommonVariables,
+            pub g: $crate::pages::TemplateCommonVariables,
             $(c: $custom_field,)?
         }
 

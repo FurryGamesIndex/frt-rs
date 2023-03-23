@@ -19,6 +19,7 @@ impl PageMisc {
     }
 
     fn render_page(
+        name: &str,
         rcontext: &RenderContext,
         template: impl Template,
         output_fn: &str,
@@ -27,6 +28,8 @@ impl PageMisc {
         if !i18n_support && rcontext.lang != LangId::default() {
             return Ok(PageRenderOutput::default());
         }
+
+        info!("Rendering: {}", name);
 
         let s = template.render()?;
 
@@ -46,18 +49,21 @@ impl Page for PageMisc {
         let mut ret = PageRenderOutput::default();
 
         ret.extend(Self::render_page(
+            "misc:index",
             rc,
             IndexTemplate::new(rc),
             "/index.html",
             true,
         )?);
         ret.extend(Self::render_page(
+            "misc:languages",
             rc,
             LanguagesTemplate::new(rc),
             "languages.html",
             false,
         )?);
         ret.extend(Self::render_page(
+            "misc:404",
             rc,
             C404Template::new(rc),
             "404.html",
