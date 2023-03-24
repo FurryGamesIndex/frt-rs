@@ -30,6 +30,6 @@ jobs:
           for asset in ./target/output/*; do
             assets+=("-a" "$asset")
           done
-          hub release edit "${assets[@]}" -m "" _gh_assets
+          hub release edit "${assets[@]}" -m "" _rolling
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
