@@ -18,3 +18,20 @@ toml = "0.5"
 askama = "0.12"
 
 clap = { version = "4.0", features = ["derive"] }
+
+[profile.relwithdbginfo]
+inherits = "release"
+debug = 2
+
+[profile.relwithdbginfo.package.frt]
+debug = 2
+
+[profile.relwithdbginfo.package.libfrt]
+debug = 2
+
+[profile.relwithdbginfo.package.libfrt-backend-www]
+debug = 2
+
+[profile.relwithdbginfo.package."*"]
+debug = 1
+#strip = "debuginfo"
