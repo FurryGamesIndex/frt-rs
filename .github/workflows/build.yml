@@ -17,7 +17,7 @@ jobs:
 
       - name: Rustup
         run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s - -- --profile minimal --target x86_64-unknown-linux-gnu,aarch64-unknown-linux-gnu,x86_64-pc-windows-gnu -y
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s - --profile minimal --target x86_64-unknown-linux-gnu,aarch64-unknown-linux-gnu,x86_64-pc-windows-gnu -y
 
       - name: Build
         run: |
