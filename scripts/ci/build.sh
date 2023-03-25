@@ -13,7 +13,7 @@ for i in "${targets[@]}"; do
     echo "=> $i"
 
     _bin_suffix="${bin_suffix[$i]}"
-    _strip="${strip_cmd[$i]}"
+    #_strip="${strip_cmd[$i]}"
 
     cargo build \
         --profile relwithdbginfo \
@@ -21,11 +21,13 @@ for i in "${targets[@]}"; do
 
     cp "target/$i/relwithdbginfo/frt$_bin_suffix" "target/output/frt-$i$_bin_suffix"
 
-    if [ -n "$_strip" ]; then
-        cp "target/$i/relwithdbginfo/frt$_bin_suffix" "target/output/frt-stripped-$i$_bin_suffix"
-        $_strip -K '*frt*' -w -s "target/output/frt-stripped-$i$_bin_suffix"
-    fi
+    #if [ -n "$_strip" ]; then
+    #    cp "target/$i/relwithdbginfo/frt$_bin_suffix" "target/output/frt-stripped-$i$_bin_suffix"
+    #    $_strip -K '*frt*' -w -s "target/output/frt-stripped-$i$_bin_suffix"
+    #fi
+
+    post_commands "$i" "target/output/frt-$i$_bin_suffix"
 
     gzip -f "target/output/frt-$i$_bin_suffix"
-    [ -f "target/output/frt-stripped-$i$_bin_suffix" ] && gzip -f "target/output/frt-stripped-$i$_bin_suffix"
+    #[ -f "target/output/frt-stripped-$i$_bin_suffix" ] && gzip -f "target/output/frt-stripped-$i$_bin_suffix"
 done

@@ -21,17 +21,17 @@ clap = { version = "4.0", features = ["derive"] }
 
 [profile.relwithdbginfo]
 inherits = "release"
-debug = 2
+debug = 1
+strip = "none"
 
 [profile.relwithdbginfo.package.frt]
-debug = 2
+debug = 1
 
 [profile.relwithdbginfo.package.libfrt]
-debug = 2
+debug = 1
 
 [profile.relwithdbginfo.package.libfrt-backend-www]
-debug = 2
+debug = 1
 
 [profile.relwithdbginfo.package."*"]
-debug = 1
-#strip = "debuginfo"
+debug = false
