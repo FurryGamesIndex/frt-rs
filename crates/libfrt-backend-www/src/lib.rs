@@ -11,11 +11,11 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 use anyhow::Result;
+use pages::list::PageList;
 
 use crate::rc::RenderContext;
 use entries::game::GameWWW;
 use libfrt::backend::{Backend, BackendArguments};
-use libfrt::error::{Error, ErrorKind};
 use libfrt::i18n::LangId;
 use libfrt::profile::Profile;
 use libfrt::utils::fs::{copy_dir, ensure_dir, make_dir};
@@ -35,12 +35,13 @@ pub struct BackendWWW {
     output: OutputMode,
     target: String,
 
-    stylesheets: Stylesheets,
     pages: HashMap<String, Box<dyn Page>>,
+
+    stylesheets: Stylesheets,
     icons: HashMap<String, u32>,
-    langs: Vec<LangId>,
 
     games: HashMap<String, GameWWW>,
+    langs: Vec<LangId>,
 }
 
 impl BackendWWW {
@@ -54,9 +55,10 @@ impl BackendWWW {
             output: OutputMode::NoOutput,
             target: String::new(),
 
+            pages: HashMap::new(),
+
             stylesheets: Stylesheets::default(),
             icons: HashMap::new(),
-            pages: HashMap::new(),
 
             games: HashMap::new(),
             langs: Vec::new(),
@@ -79,7 +81,9 @@ impl BackendWWW {
         backend
             .pages
             .insert("misc".to_string(), Box::new(PageMisc::new()));
-        //backend.pages.insert("list".to_string(), Box::new(PageList::new()));
+        backend
+            .pages
+            .insert("list".to_string(), Box::new(PageList::new()));
 
         Ok(backend)
     }
@@ -109,12 +113,13 @@ impl Backend for BackendWWW {
             self.langs.push(LangId::default());
         }
 
-        //for game in data.games.values_mut() {
-        //    if game.dirty {
-        //        self.games.insert(game.id.clone(), GameWWW::from_game(game, &self)?);
-        //        //game.dirty = false;
-        //    }
-        //}
+        for game in data.games.values_mut() {
+            //if game.dirty {
+            self.games
+                .insert(game.id.clone(), GameWWW::cook_game(game.clone(), &self)?);
+            //game.dirty = false;
+            //}
+        }
 
         Ok(())
     }

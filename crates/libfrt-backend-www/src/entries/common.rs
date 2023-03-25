@@ -11,18 +11,16 @@ pub struct HtmlText {
     pub plain: String,
 }
 
-impl<> From<String> for HtmlText {
+impl From<String> for HtmlText {
     fn from(s: String) -> Self {
         Self {
             html: libfrt::utils::xml::escape_str(s.as_str()).replace("\n", "<br />"),
-            plain: s
+            plain: s,
         }
     }
 }
 
-impl HtmlText {
-    
-}
+impl HtmlText {}
 
 pub struct HtmlImageCondition {
     pub uri: String,
@@ -44,15 +42,10 @@ impl HtmlMedia {
     pub fn from_image(game: &Game, backend: &BackendWWW, image: &Image) -> Result<HtmlMedia> {
         match &image.source {
             ImageSource::LocalShared(_) => todo!(),
-            ImageSource::Bundled(file_name) => {
-                
-            },
-            ImageSource::Remote(uri) => {
-
-            },
+            ImageSource::Bundled(file_name) => {}
+            ImageSource::Remote(uri) => {}
         }
 
         todo!("")
-
     }
 }

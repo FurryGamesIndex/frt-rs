@@ -1,14 +1,17 @@
-{% include 'peafowl-private/header.html' %}
-{% include 'peafowl-private/nav.html' %}
+{% extends "peafowl-private/base.html" %}
+
+{% let v_actived_page = "list:list" %}
+
+{% block content %}
 <main class="main_list item_container">
 {#% include 'peafowl-private/list-chain.html' %#}
 
-{% for game in games %}
+{% for game in c.games %}
+	{%- let cooked = game.cooked.get(rc.lang).ok_or("No cooked l10n game data")? -%}
 	<article class="item">
-		{% include 'peafowl-private/list-item.html' %}
+		{% include "peafowl-private/list-item.html" %}
 	</article>
 	<hr />
 {% endfor %}
 </main>
-{% include 'peafowl-private/footer.html' %}
-{% include 'peafowl-private/end.html' %}
+{% endblock %}

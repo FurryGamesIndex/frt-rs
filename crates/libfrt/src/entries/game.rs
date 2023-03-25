@@ -6,7 +6,6 @@ use anyhow::Result;
 use super::link::Link;
 use super::media::{Image, Media};
 use super::raw::RawGame;
-use crate::error::{Error, ErrorKind};
 use crate::i18n::LangId;
 use crate::ContextData;
 

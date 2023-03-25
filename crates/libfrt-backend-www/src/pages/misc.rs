@@ -7,9 +7,9 @@ use super::RenderContext;
 use askama::Template;
 use libfrt::i18n::LangId;
 
-template!("index.html", IndexTemplate);
-template!("languages.html", LanguagesTemplate);
-template!("404.html", C404Template);
+template!("index.html", IndexTemplate, "..");
+template!("languages.html", LanguagesTemplate, "..");
+template!("404.html", C404Template, "/");
 
 pub struct PageMisc {}
 

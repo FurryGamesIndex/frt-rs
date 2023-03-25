@@ -1,5 +1,5 @@
 pub mod misc;
-//pub mod list;
+pub mod list;
 
 use std::collections::HashMap;
 
@@ -49,7 +49,7 @@ pub struct TemplateCommonVariables {
 }
 
 macro_rules! template {
-    ($file:literal, $name:ident $(, $custom_field:ty)?) => {
+    ($file:literal, $name:ident, $rr:literal $(, $custom_field:ty)?) => {
         #[derive(Template)]
         #[template(path = $file)]
         pub(crate) struct $name<'a> {
@@ -62,10 +62,10 @@ macro_rules! template {
         impl<'a> $name<'a> {
             fn new(rc: &'a RenderContext) -> $name<'a> {
                 Self {
-                    rr: "..",
+                    rr: $rr,
                     rc,
                     g: $crate::pages::TemplateCommonVariables::default(),
-                    $(c: $custom_field::default(),)?
+                    $(c: <$custom_field>::default(),)?
                 }
             }
         }

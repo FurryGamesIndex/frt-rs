@@ -1,9 +1,10 @@
-use std::{collections::HashMap, path::PathBuf, rc::Rc};
+use std::{collections::HashMap, rc::Rc};
 
 use anyhow::Result;
 use serde::Serialize;
 
 use crate::BackendWWW;
+
 use super::common::HtmlText;
 use libfrt::{
     entries::game::{Description, Game},
@@ -18,24 +19,18 @@ pub struct CookedGame {
 }
 
 pub struct GameWWW {
-    pub game: Rc<Game>,
+    pub orig: Rc<Game>,
     pub cooked: HashMap<LangId, CookedGame>,
 }
 
 impl GameWWW {
     pub fn cook_game(game: Rc<Game>, backend: &BackendWWW) -> Result<GameWWW> {
-        let mut game_l10ns = HashMap::new();
+        let mut cooked = HashMap::new();
 
         for lang in backend.langs.iter() {
-            let description = if game.l10n.contains_key(lang) {
-                game.l10n
-                    .get(lang)
-                    .unwrap()
-                    .description
-                    .as_ref()
-                    .unwrap_or(&game.description)
-            } else {
-                &game.description
+            let description = match game.l10n.get(lang) {
+                Some(gl10n) => gl10n.description.as_ref().unwrap_or(&game.description),
+                None => &game.description,
             };
 
             let description = match description {
@@ -45,10 +40,9 @@ impl GameWWW {
                 }
             };
 
-            let brief_description = if game.l10n.contains_key(lang) {
-                game.l10n.get(lang).unwrap().brief_description.as_ref()
-            } else {
-                game.brief_description.as_ref()
+            let brief_description = match game.l10n.get(lang) {
+                Some(gl10n) => gl10n.brief_description.as_ref(),
+                None => game.brief_description.as_ref(),
             };
 
             let brief_description = match brief_description {
@@ -64,18 +58,12 @@ impl GameWWW {
                 }
             };
 
-            game_l10ns.insert(
+            cooked.insert(
                 lang.to_owned(),
                 CookedGame {
-                    name: if game.l10n.contains_key(lang) {
-                        game.l10n
-                            .get(lang)
-                            .unwrap()
-                            .name
-                            .as_ref()
-                            .unwrap_or(&game.name)
-                    } else {
-                        &game.name
+                    name: match game.l10n.get(lang) {
+                        Some(gl10n) => gl10n.name.as_ref().unwrap_or(&game.name),
+                        None => &game.name,
                     }
                     .to_owned()
                     .into(),
@@ -85,9 +73,6 @@ impl GameWWW {
             );
         }
 
-        Ok(GameWWW {
-            game,
-            cooked: game_l10ns,
-        })
+        Ok(GameWWW { orig: game, cooked })
     }
 }
