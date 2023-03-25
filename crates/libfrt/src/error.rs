@@ -20,6 +20,9 @@ pub enum ErrorKind {
     /// Template, rule, image or any dependent resource not found
     NotExist,
 
+    /// External file not valid, breaked image format, etc
+    InvalidFileOrData,
+
     /// Any other kind of errors not listed.
     Other,
 }
@@ -32,6 +35,7 @@ impl Display for Error {
             ErrorKind::InvalidBundle => write!(f, "{}", "Bundle is invalid: ")?,
             ErrorKind::InvalidArgument => write!(f, "{}", "Invalid argument: ")?,
             ErrorKind::NotExist => write!(f, "{}", "No such resouce: ")?,
+            ErrorKind::InvalidFileOrData => write!(f, "{}", "Invalid file or data: ")?,
             ErrorKind::Other => write!(f, "{}", "Other: ")?,
         };
         write!(f, "{}", self.message)?;

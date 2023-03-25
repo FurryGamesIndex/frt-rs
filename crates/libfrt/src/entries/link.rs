@@ -7,7 +7,6 @@ use regex::Regex;
 use serde::{Deserialize, Serialize};
 
 use super::raw::RawLinkItem;
-use crate::error::{Error, ErrorKind};
 use crate::i18n::LangId;
 
 #[derive(Serialize, Debug)]

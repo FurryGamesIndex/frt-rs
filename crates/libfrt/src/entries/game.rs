@@ -87,7 +87,7 @@ impl Game {
             brief_description: raw_game.brief_description,
             links: links,
             medias: medias,
-            thumbnail: raw_game.thumbnail.into(),
+            thumbnail: Image::from_str(&raw_game.thumbnail, None, Some(&bundle_path))?,
 
             l10n: HashMap::new(),
 
