@@ -20,7 +20,9 @@ function copy_games {
 
         mkdir -p "$dst/$name"
 
-        cp "$i" "$dst/$name/game.yaml"
+        cp -v "$i" "$dst/$name/game.yaml"
+
+        cp -v "$src_a/$name/"* "$dst/$name/"
 
     done < <(find "$src" -maxdepth 1 -type f -name '*.yaml')
 }
