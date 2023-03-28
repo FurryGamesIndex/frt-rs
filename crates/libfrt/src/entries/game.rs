@@ -3,6 +3,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 
+use super::Bundle;
 use super::link::Link;
 use super::media::{Image, Media};
 use super::raw::RawGame;
@@ -35,6 +36,20 @@ pub struct Game {
 
     pub bundle_path: PathBuf,
     //pub dirty: bool,
+}
+
+impl Bundle for Game {
+    fn path(&self) -> &PathBuf {
+        &self.bundle_path
+    }
+
+    fn kind(&self) -> &'static str {
+        "game"
+    }
+
+    fn id(&self) -> &str {
+        self.id.as_str()
+    }
 }
 
 #[derive(Debug)]
