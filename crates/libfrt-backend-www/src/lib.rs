@@ -3,6 +3,7 @@ mod pages;
 mod profile;
 mod rc;
 mod stylesheet;
+mod utils;
 
 #[macro_use]
 extern crate log;
