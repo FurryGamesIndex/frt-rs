@@ -52,6 +52,18 @@ impl HtmlImageMIME {
         }
     }
 
+    pub fn from_src<S>(src: S) -> Option<Self>
+    where
+        S: AsRef<str>,
+    {
+        let src = src.as_ref();
+
+        match src.rfind('.') {
+            Some(p) => Self::from_suffix(&src[p + 1..]),
+            None => None,
+        }
+    }
+
     pub fn as_str(&self) -> &'static str {
         match self {
             HtmlImageMIME::ImageJpeg => "image/jpeg",
@@ -139,10 +151,10 @@ impl HtmlImage {
     ) -> Result<()> {
         let mime = match mime {
             Some(m) => m,
-            None => HtmlImageMIME::from_suffix(uri.as_str()).ok_or_else(|| {
+            None => HtmlImageMIME::from_src(uri.as_str()).ok_or_else(|| {
                 libfrt::err!(
                     InvalidArgument,
-                    "Can not recognize MIME for {}",
+                    "Can not determine MIME for {}",
                     uri.as_str()
                 )
             })?,
@@ -159,9 +171,10 @@ impl HtmlImage {
         Ok(())
     }
 
-    pub fn html<S>(&self, rr: S, node_classes: S) -> Result<String>
+    pub fn html<S, D>(&self, rr: S, node_classes: D, alt: Option<&str>) -> Result<String>
     where
         S: AsRef<str>,
+        D: AsRef<str>,
     {
         let mut node = format!(r#"class="{}" "#, xml::escape_str(node_classes));
 
@@ -169,7 +182,13 @@ impl HtmlImage {
             node.push_str(format!(r#"width="{}" height="{}" "#, w, h).as_str())
         }
 
-        if let Some(alt) = self.captain.as_ref() {
+        if let Some(alt) = match alt {
+            Some(alt) => Some(alt),
+            None => match self.captain.as_ref() {
+                Some(alt) => Some(alt.as_str()),
+                None => None,
+            },
+        } {
             node.push_str(format!(r#"alt="{}" "#, xml::escape_str(alt)).as_str())
         }
 
@@ -177,10 +196,7 @@ impl HtmlImage {
 
         for (k, v) in self.extra_queries.iter() {
             if query_str.is_empty() {
-                query_str = String::from("?");
-                query_str.push_str(
-                    format!(r#"{}={}"#, uri::encode_rfc3986(k), uri::encode_rfc3986(v)).as_str(),
-                );
+                query_str = format!(r#"?{}={}"#, uri::encode_rfc3986(k), uri::encode_rfc3986(v));
             } else {
                 query_str.push_str(
                     format!(r#"&{}={}"#, uri::encode_rfc3986(k), uri::encode_rfc3986(v)).as_str(),
@@ -211,7 +227,9 @@ impl HtmlImage {
                 result.push_str(
                     format!(
                         r#"<img {}src="{}{}" loading="lazy"></picture>"#,
-                        node, fb_cond.srcset.to_str(rr.as_ref()), query_str
+                        node,
+                        fb_cond.srcset.to_str(rr.as_ref()),
+                        query_str
                     )
                     .as_str(),
                 );
