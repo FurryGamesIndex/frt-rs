@@ -23,18 +23,19 @@ jobs:
         run: |
           ./scripts/ci/build.sh
 
-      - uses: actions/upload-artifact@v3
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
         with:
           name: bin
           path: ./target/output/*
 
-      - name: Upload
+      - name: Upload release
         run: |
           set -x
           assets=()
           for asset in ./target/output/*; do
             assets+=("-a" "$asset")
           done
-          hub create edit "${assets[@]}" -m "Rolling release" _rolling
+          hub edit "${assets[@]}" -m "" _rolling
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
