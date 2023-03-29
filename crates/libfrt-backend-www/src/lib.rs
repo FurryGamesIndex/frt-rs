@@ -10,8 +10,12 @@ extern crate log;
 
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
+use std::rc::Rc;
 
 use anyhow::Result;
+use entries::common::HtmlImage;
+use libfrt::entries::media::{Image, ImageSource};
+use libfrt::entries::Bundle;
 use pages::list::PageList;
 
 use crate::rc::RenderContext;
@@ -19,7 +23,7 @@ use entries::game::GameWWW;
 use libfrt::backend::{Backend, BackendArguments};
 use libfrt::i18n::LangId;
 use libfrt::profile::Profile;
-use libfrt::utils::fs::{copy_dir, ensure_dir, make_dir};
+use libfrt::utils::fs::{copy_dir, ensure_dir};
 use libfrt::ContextData;
 use pages::{misc::PageMisc, Page, PageRenderOutput};
 use profile::ProfileWWW;
@@ -88,12 +92,45 @@ impl BackendWWW {
 
         Ok(backend)
     }
+
+    pub fn import_image(&self, image: &Image, bundle: Rc<dyn Bundle>) -> Result<HtmlImage> {
+        let mut hi = HtmlImage::init_base_from_image(image);
+
+        match &image.source {
+            ImageSource::LocalShared(_) => todo!(),
+            ImageSource::Bundled(s) => {
+                let new_path = Path::new(
+                    format!("assets/{}/{}/{}", bundle.kind(), { bundle.id() }, s).as_str(),
+                )
+                .to_path_buf();
+
+                if let OutputMode::Filesystem(output_dir) = &self.output {
+                    let dir = output_dir.join(&new_path);
+                    let target_file = dir.join(s);
+
+                    if std::fs::metadata(&target_file).is_err() {
+                        ensure_dir(&dir)?;
+                        std::fs::copy(bundle.path().join(s), &dir)?;
+                    }
+                }
+
+                // TODO: webp convert support
+
+                hi.add_source_simple(new_path.display().to_string(), false, None)?;
+            }
+            ImageSource::Remote(s) => {
+                hi.add_source_simple(s.to_owned(), true, None)?;
+            }
+        };
+
+        Ok(hi)
+    }
 }
 
 impl Backend for BackendWWW {
     fn resync(
         &mut self,
-        profile: &Profile,
+        _profile: &Profile,
         data: &mut ContextData,
         args: &BackendArguments,
     ) -> Result<()> {
@@ -105,6 +142,10 @@ impl Backend for BackendWWW {
                 .ok_or_else(|| libfrt::err!(InvalidArgument, "Missing argument 'output'"))?;
 
             self.output = OutputMode::Filesystem(Path::new(&output_dir).into());
+
+            if std::fs::metadata(&output_dir).is_ok() {
+                std::fs::remove_dir_all(&output_dir)?;
+            }
         }
 
         self.target = args.get_string("target").unwrap_or(String::new());
@@ -125,14 +166,8 @@ impl Backend for BackendWWW {
         Ok(())
     }
 
-    fn render(&self, profile: &Profile, data: &ContextData) -> Result<BackendArguments> {
+    fn render(&self, _profile: &Profile, data: &ContextData) -> Result<BackendArguments> {
         let mut ret = BackendArguments::default();
-
-        if let OutputMode::Filesystem(output_dir) = &self.output {
-            if std::fs::metadata(&output_dir).is_ok() {
-                std::fs::remove_dir_all(&output_dir)?;
-            }
-        }
 
         let mut render_context = RenderContext {
             backend: &self,

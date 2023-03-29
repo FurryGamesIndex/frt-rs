@@ -8,6 +8,8 @@ pub struct ProfileWWW {
     pub path_static_layers: Vec<String>,
     pub path_stylesheets: Vec<String>,
     pub path_icon: Vec<String>,
+
+    pub image_convert_webp: bool,
 }
 
 impl Default for ProfileWWW {
@@ -17,6 +19,8 @@ impl Default for ProfileWWW {
             path_static_layers: vec![String::from("www/root")],
             path_stylesheets: vec![String::from("www/styles")],
             path_icon: vec![String::from("www/icons/build")],
+
+            image_convert_webp: true,
         }
     }
 }
