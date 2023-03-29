@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Eq, PartialEq, Clone, Hash, Debug)]
+#[derive(Serialize, Eq, PartialEq, Clone, Copy, Hash, Debug)]
 pub enum LangId {
     EnUs,
     ZhCn,
@@ -40,7 +40,7 @@ impl LangId {
         match self {
             LangId::EnUs => ("en", "us", true),
             LangId::ZhCn => ("zh", "cn", false),
-            LangId::ZhTw => ("zh", "tW", false),
+            LangId::ZhTw => ("zh", "tw", false),
             LangId::JaJp => ("ja", "jp", true),
         }
     }

@@ -2,8 +2,6 @@ use std::path::Path;
 
 use anyhow::Result;
 
-use crate::error::{Error, ErrorKind};
-
 pub fn copy_dir<U: AsRef<Path>, V: AsRef<Path>>(src: U, dst: V) -> Result<()> {
     std::fs::create_dir_all(&dst)?;
 
