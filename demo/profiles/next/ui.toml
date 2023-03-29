@@ -1,0 +1,14 @@
+[_.main]
+infobar = """
+This is FGI-next, experimental preview build of FGI, which may contain many changes that are under testing and may even be broken. <a href="https://furrygames.top/">Switch to stable version</a>
+"""
+
+[zh-cn.main]
+infobar = """
+  这是 FGI-next，FGI 的实验性预览构建，它可能包含很多正在测试中的改动，甚至可能会影响正常使用。<a href="https://furrygames.top/">切换到稳定版本</a>
+"""
+
+[zh-tw.main]
+infobar = """
+  這是 FGI-next，FGI 的實驗性預覽構建，它可能包含很多正在測試中的改動，甚至可能會影響正常使用。<a href="https://furrygames.top/">切換到穩定版本</a>
+"""

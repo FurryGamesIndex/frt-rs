@@ -1,0 +1,4 @@
+ui_config = [
+    "ui.toml",               # basic ui.toml
+    "profiles/next/ui.toml", # FGI-next overrides
+]
