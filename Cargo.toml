@@ -5,6 +5,15 @@ members = [
     "crates/frt",
 ]
 
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+
+readme = "README.md"
+homepage = "https://about.furrygames.top/frt"
+repository = "https://github.com/FurryGamesIndex/frt-rs.git"
+license = "AGPL-3.0-or-later"
+
 [workspace.dependencies]
 anyhow = { version = "1.0", features = ["backtrace"] }
 log = "0.4"

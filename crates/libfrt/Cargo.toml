@@ -1,13 +1,13 @@
 [package]
 name = "libfrt"
-version = "0.1.0"
-edition = "2021"
+version = { workspace = true }
+edition = { workspace = true }
 
 description = "2nd Gen FGI Rendering Tool - core library"
-readme = "README.md"
-homepage = "https://about.furrygames.top/frt"
-repository = "https://github.com/FurryGamesIndex/frt-rs.git"
-license = "AGPL-3.0-or-later"
+readme = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+license = { workspace = true }
 authors = ["UtopicPanther <upanther@furrygames.top>"]
 
 [lib]
