@@ -7,7 +7,7 @@
 {#% include 'peafowl-private/list-chain.html' %#}
 
 {% for game in c.games %}
-	{%- let cooked = game.cooked.get(rc.lang).ok_or("No cooked l10n game data")? -%}
+	{%- let game = game.loc_view(rc.lang.clone())? -%}
 	<article class="item">
 		{% include "peafowl-private/list-item.html" %}
 	</article>

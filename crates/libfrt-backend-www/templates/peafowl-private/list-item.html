@@ -1,7 +1,7 @@
 <section>
-    <h2 class="game_name"><a href="{{ rr }}/{{ rc.lang }}/games/{{ game.orig.id }}.html">{{ cooked.name.html|safe }}</a></h2>
+    <h2 class="game_name"><a href="{{ rr }}/{{ rc.lang }}/games/{{ game.orig.id }}.html">{{ game.loc.name.html|safe }}</a></h2>
     <div class="description">
-            {{ cooked.brief_description.html|safe }}
+        {{ game.loc.brief_description.html|safe }}
     </div>
 </section>
-{#{ game.thumbnail.with_rr(rr).html(node_class="thumbnail", alt=game_name) }#}
+{{ game.uni.thumbnail.html(rr, "thumbnail", Some(game.loc.name.plain.as_str()))?|safe }}

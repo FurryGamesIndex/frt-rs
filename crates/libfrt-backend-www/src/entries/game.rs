@@ -7,7 +7,10 @@ use crate::BackendWWW;
 
 use super::common::{HtmlImage, HtmlText};
 use libfrt::{
-    entries::game::{Description, Game},
+    entries::{
+        game::{Description, Game},
+        Bundle,
+    },
     i18n::LangId,
 };
 
@@ -27,7 +30,27 @@ pub struct GameWWW {
     pub cooked_nonl10n: CookedGameNonl10n,
 }
 
+pub struct CookedGameView<'a> {
+    pub orig: Rc<Game>,
+    pub loc: &'a CookedGameL10n,
+    pub uni: &'a CookedGameNonl10n,
+}
+
 impl GameWWW {
+    pub fn loc_view(&self, lang: LangId) -> Result<CookedGameView> {
+        Ok(CookedGameView {
+            orig: self.orig.clone(),
+            loc: self.cooked.get(&lang).ok_or_else(|| {
+                libfrt::err!(
+                    NotExist,
+                    "No l10n data for cooked game: {}",
+                    self.orig.id.as_str()
+                )
+            })?,
+            uni: &self.cooked_nonl10n,
+        })
+    }
+
     pub fn cook_game(game: Rc<Game>, backend: &BackendWWW) -> Result<GameWWW> {
         let mut cooked = HashMap::new();
 
@@ -78,9 +101,11 @@ impl GameWWW {
         }
 
         Ok(GameWWW {
-            orig: game,
+            orig: game.clone(),
             cooked,
-            cooked_nonl10n: CookedGameNonl10n { thumbnail: todo!() },
+            cooked_nonl10n: CookedGameNonl10n {
+                thumbnail: backend.import_image(&game.thumbnail, game.clone() as Rc<dyn Bundle>)?,
+            },
         })
     }
 }
