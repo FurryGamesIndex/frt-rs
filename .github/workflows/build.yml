@@ -15,20 +15,22 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v3
 
-      - name: Rustup (stage 1)
+      - name: Remove preinstalled Rust binaries
         run: |
           rm -rf ~/.rustup ~/.cargo
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s - --profile minimal --target x86_64-unknown-linux-gnu,aarch64-unknown-linux-gnu,x86_64-pc-windows-gnu -y
 
-      - name: Restore cached rust binaries
-        id: cache-primes-restore
-        uses: actions/cache/restore@v3
+      - name: Cache
+        uses: actions/cache@v3
         with:
           path: |
-            path/to/dependencies
-            some/other/dependencies
-          key: ${{ runner.os }}-primes
-          
+            ~/.rustup
+            ~/.cargo
+          key: ${{ runner.os }}-frt
+
+      - name: Rustup
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s - --profile minimal --target x86_64-unknown-linux-gnu,aarch64-unknown-linux-gnu,x86_64-pc-windows-gnu -y
+
       - name: Build
         run: |
           ./scripts/ci/build.sh
@@ -40,12 +42,8 @@ jobs:
           path: ./target/output/*
 
       - name: Upload release
-        run: |
-          set -x
-          assets=()
-          for asset in ./target/output/*; do
-            assets+=("-a" "$asset")
-          done
-          hub release edit "${assets[@]}" -m "" _rolling
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: _rolling
+          files: |
+            ./target/output/*
