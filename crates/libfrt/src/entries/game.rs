@@ -3,10 +3,10 @@ use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 
-use super::Bundle;
 use super::link::Link;
 use super::media::{Image, Media};
 use super::raw::RawGame;
+use super::Bundle;
 use crate::i18n::LangId;
 use crate::ContextData;
 
@@ -63,7 +63,7 @@ impl Game {
     pub fn build(
         data: &ContextData,
         id: String,
-        mut raw_game: RawGame,
+        raw_game: RawGame,
         bundle_path: PathBuf,
     ) -> Result<Self> {
         let description = match raw_game.description_format {
@@ -86,14 +86,13 @@ impl Game {
             .collect();
         let links = links?;
 
-        let medias = raw_game
-            .screenshots
-            .into_iter()
-            .map(|sh| GameMedia {
-                sensitive: sh.is_sensitive(),
-                media: sh.into(),
-            })
-            .collect();
+        let mut medias = Vec::new();
+        for ss in raw_game.screenshots.into_iter() {
+            medias.push(GameMedia {
+                sensitive: ss.is_sensitive(),
+                media: Media::from_raw(ss, Some(&bundle_path))?,
+            });
+        }
 
         Ok(Self {
             id: id,

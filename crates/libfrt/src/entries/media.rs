@@ -3,7 +3,7 @@ use std::path::PathBuf;
 
 use crate::utils::is_remote::is_remote;
 
-use super::raw::RawScreenshotItem;
+use super::raw::{RawScreenshotItem, RawVideoSourceItem};
 
 #[derive(Debug)]
 pub enum ImageSource {
@@ -93,27 +93,46 @@ pub struct VideoSource {
     pub uri: String,
 }
 
+impl From<RawVideoSourceItem> for VideoSource {
+    fn from(value: RawVideoSourceItem) -> Self {
+        Self {
+            mime: value.mime,
+            uri: value.uri,
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum Media {
     Image(Image),
     Youtube(String),
     Video { sources: Vec<VideoSource> },
-}
-
-impl From<RawScreenshotItem> for Media {
-    fn from(_: RawScreenshotItem) -> Self {
-        error!("impl<> From<RawScreenshotItem> for Media: fn from(): STUB!"); /* TODO */
-        Self::Image(Image {
-            source: ImageSource::Remote("http://example.com".to_string()),
-            captain: None,
-            size: None,
-            mtime: None,
-        })
-    }
+    HBox(Vec<Image>),
 }
 
 impl From<Image> for Media {
     fn from(value: Image) -> Self {
         Self::Image(value)
+    }
+}
+
+impl Media {
+    pub fn from_raw(raw: RawScreenshotItem, bundle_path: Option<&PathBuf>) -> Result<Self> {
+        match raw {
+            RawScreenshotItem::SimpleImage(uri) | RawScreenshotItem::Image { uri, .. } => {
+                Ok(Self::Image(Image::from_str(uri, None, bundle_path)?))
+            }
+            RawScreenshotItem::Youtube { youtube } => Ok(Self::Youtube(youtube)),
+            RawScreenshotItem::Video { video, .. } => Ok(Self::Video {
+                sources: video.into_iter().map(|rvs| rvs.into()).collect(),
+            }),
+            RawScreenshotItem::HBox { hbox, .. } => {
+                let mut result = Vec::new();
+                for image in hbox.into_iter() {
+                    result.push(Image::from_str(image, None, bundle_path)?);
+                }
+                Ok(Self::HBox(result))
+            }
+        }
     }
 }
